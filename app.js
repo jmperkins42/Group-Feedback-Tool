@@ -37,14 +37,27 @@ document.querySelector('#btnSwapRegister').addEventListener('click', function(){
 
 // click event for btnSwapLogin to hide frmRegister and show frmLogin
 document.querySelector('#btnSwapLoginTop').addEventListener('click', function(){
-    document.querySelector('#frmRegister').style.display = 'none'
+    document.querySelector('#frmStudentRegister').style.display = 'none'
     document.querySelector('#frmLogin').style.display = 'block'
 })
 
 document.querySelector('#btnSwapLoginBottom').addEventListener('click', function(){
-    document.querySelector('#frmRegister').style.display = 'none'
+    document.querySelector('#frmStudentRegister').style.display = 'none'
     document.querySelector('#frmLogin').style.display = 'block'
 })
+
+// click event for Student Registration
+document.querySelector('#btnStudent').addEventListener('click', function(){
+    document.querySelector('#frmChooseRole').style.display = 'none'
+    document.querySelector('#frmStudentRegister').style.display = 'block'
+})
+
+// click event for Instructor Registration
+document.querySelector('#btnInstructor').addEventListener('click', function(){
+    document.querySelector('#frmChooseRole').style.display = 'none'
+    document.querySelector('#frmInstructorRegister').style.display = 'block'
+})
+
 
 // click event for btnLogin
 document.querySelector('#btnLogin').addEventListener('click', function(){
