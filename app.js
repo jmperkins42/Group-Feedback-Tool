@@ -22,6 +22,13 @@ const regEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)
 
 
 // Start click handlers
+
+// click event for btnSwapLogin to hide frmChooseRole and show frmLogin
+document.querySelector('#btnBackToLogin').addEventListener('click', function(){
+    document.querySelector('#frmChooseRole').style.display = 'none'
+    document.querySelector('#frmLogin').style.display = 'block'
+})
+
 // click event for btnSwapRegister to hide frmLogin and show frmRegister
 document.querySelector('#btnSwapRegister').addEventListener('click', function(){
     document.querySelector('#frmLogin').style.display = 'none'
