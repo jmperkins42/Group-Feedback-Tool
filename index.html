@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Feedback Tool</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/litera/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-primary">
+<body class="vh-100 bg-dark bg-gradient">
     <div class="d-flex mt-5 mb-5 justify-content-center align-items-center vh-70">
-        <form id="frmLogin" class="card col-10 col-md-6 col-xl-4 mt-5">
+        <form id="frmLogin" class="card col-10 col-md-6 col-xl-4 mt-5 rounded-3">
             <div class="card-body">
-                <h1 class="text-center text-primary">Company</h1>
-                <h3 class="text-center text-primary">Group Feedback Tool</h3>
+                <h1 class="text-center text-primary fw-bold">Company</h1>
+                <h3 class="text-center text-dark">Group Feedback Tool</h3>
                 <input id="txtUsernameLogin" type="email" placeholder="johndoe@email.com" class="form-control mt-4" aria-label="Username">
                 <input id="txtPasswordLogin" type="password" placeholder="Password" class="form-control mt-2" aria-label="Password">
                 <hr class="mt-4 mb-4"/>
                 <button id="btnLogin" type="button" class="btn btn-primary col-12 mt-2">Log in</button>
-                <button id="btnSwapRegister" type="button" class="btn btn-link col-12 mt-0">Need an account? Register here</button>
+                <div class="d-flex justify-content-center align-items-center mt-2">
+                    Need an account?
+                    <button id="btnSwapRegister" type="button" class="btn btn-link mt-0">Register here</button>
+                </div>
             </div>
         </form>
 
@@ -26,44 +29,94 @@
                 <h1 class="text-center text-primary">Company</h1>
                 <h3 class="text-center text-primary">Group Feedback Tool</h3>
                 <h5 class="text-center mt-4">Choose your role:</h3>
-                <button id="btnStudent" type="button" class="btn btn-primary col-12 mt-2">Student</button>
-                <button id="btnInstructor" type="button" class="btn btn-primary col-12 mt-2">Instructor</button>
+                <button id="btnStudent" type="button" class="btn btn-primary col-12 mt-2 rounded-3">Student</button>
+                <button id="btnInstructor" type="button" class="btn btn-secondary col-12 mt-2 rounded-3">Instructor</button>
 
                 <button id="btnBackToLogin" type="button" class="btn btn-link col-12 mt-2">Go Back</button>
             </div>
         </form>
 
-        <!-- Student Register Form -->
-        <form id="frmStudentRegister" class="card col-10 col-md-6 col-xl-4 mt-5" style="display:none;">
-            <div class="card-body">
-                <h1 class="text-center text-primary">Company</h1>
-                <h3 class="text-center text-primary">Group Feedback Tool</h3>
-                <h5 class="text-center mt-4">Account Registration:</h3>
-                <button id="btnSwapLoginTop" type="button" class="btn btn-link col-12 mt-0">Already have an account? Click here to log in</button>
-                <h6 class="mt-3">Personal Information:</h2>
-                <input id="txtFirstName" placeholder="First Name" class="form-control mt-3" aria-label="Input for First Name">
-                <input id="txtMiddleName" placeholder="Middle Name" class="form-control mt-2" aria-label="Input for Middle Name">
-                <input id="txtLastName" placeholder="Last Name" class="form-control mt-2" aria-label="Input for Last Name">
-                <input id="txtPhoneNumber" placeholder="Phone number" class="Phone form-control mt-2" aria-label="Input for Phone number">
-                <h6 class="mt-4">Organization Information:</h2>
-                <select id="cboOrgType" class="select form-control mt-3" aria-label="Select your Organization Type">
-                    <option value="">Organization Type</option>
+    <!-- Student Register Form -->
+    <form id="frmStudentRegister" class="card col-10 col-md-6 col-xl-4 mt-5" style="display:none;">
+        <div class="card-body">
+            <h1 class="text-center text-primary">Company</h1>
+            <h3 class="text-center text-primary">Group Feedback Tool</h3>
+            <h5 class="text-center mt-4">Student Account Registration:</h3>
+            <div class="d-flex justify-content-center align-items-center">
+                Already have an account?
+                <button id="btnSwapLoginTop" type="button" class="btn btn-link mb-0">Log in</button>
+            </div>
+            
+            <h6 class="mt-3">Personal Information:</h6>
+            <div class="form-floating mt-3">
+                <input id="txtFirstName" class="form-control" aria-label="Input for First Name" type="text" placeholder="First Name">
+                <label for="txtFirstName">First Name</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtMiddleName" class="form-control" aria-label="Input for Middle Name" type="text" placeholder="Middle Name">
+                <label for="txtMiddleName">Middle Name</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtLastName" class="form-control" aria-label="Input for Last Name" type="text" placeholder="Last Name">
+                <label for="txtLastName">Last Name</label>
+            </div>
+
+            <h6 class="mt-3">Contact Information:</h6>
+            <div class="form-floating mt-2">
+                <input id="txtPhoneNumber" class="form-control" aria-label="Input for Phone number" type="tel" placeholder="Phone number">
+                <label for="txtPhoneNumber">Phone number</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtDiscordName" class="form-control" aria-label="Input for Discord Name" type="text" placeholder="Discord Name">
+                <label for="txtDiscordName">Discord Name (Optional)</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtTeamsEmail" class="form-control" aria-label="Input for Teams Email" type="email" placeholder="Teams Email">
+                <label for="txtTeamsEmail">Teams Email</label>
+            </div>
+
+            <h6 class="mt-4">Organization Information:</h6>
+            <div class="form-floating mt-3">
+                <select id="cboOrgType" class="form-control" aria-label="Select your Organization Type">
+                    <option value="">Choose Organization Type</option>
                     <option value="Company">Company</option>
                     <option value="High School">High School</option>
                     <option value="College">College</option>
                     <option value="Other">Other</option>
                 </select>
-                <input id="txtOrgName" placeholder="Organization Name" class="form-control mt-2" aria-label="Input for Organization Name">
-                <input id="txtGroupCode" placeholder="Group Code (optional, if joining a group)" class="form-control mt-2" aria-label="Input for Optional Group Code">
-                <h6 class="mt-4">Account Information:</h2>
-                <input id="txtUsernameRegister" type="email" placeholder="johndoe@email.com" class="form-control mt-3" aria-label="Input for Username">
-                <input id="txtPasswordRegister" type="password" placeholder="Password" class="form-control mt-2" aria-label="Input for Password">
-                <input id="txtRetypePassword" type="password" placeholder="Retype Password" class="form-control mt-2 mb-2" aria-label="Input for Retyped Password">
-                <hr class="mt-4 mb-4"/>
-                <button id="btnRegister" type="button" class="btn btn-primary col-12 mt-2">Register</button>
-                <button id="btnSwapLoginBottom" type="button" class="btn btn-link col-12 mt-0">Already have an account? Click here to log in</button>
+                <label for="cboOrgType">Organization Type</label>
             </div>
-        </form>
+            <div class="form-floating mt-2">
+                <input id="txtOrgName" class="form-control" aria-label="Input for Organization Name" type="text" placeholder="Organization Name">
+                <label for="txtOrgName">Organization Name</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtGroupCode" class="form-control" aria-label="Input for Optional Group Code" type="text" placeholder="Group Code (optional, if joining a group)">
+                <label for="txtGroupCode">Group Code (optional, if joining a group)</label>
+            </div>
+
+            <h6 class="mt-4">Account Information:</h6>
+            <div class="form-floating mt-3">
+                <input id="txtUsernameRegister" class="form-control" aria-label="Input for Username" type="email" placeholder="johndoe@email.com">
+                <label for="txtUsernameRegister">Username</label>
+            </div>
+            <div class="form-floating mt-2">
+                <input id="txtPasswordRegister" class="form-control" aria-label="Input for Password" type="password" placeholder="Password">
+                <label for="txtPasswordRegister">Password</label>
+            </div>
+            <div class="form-floating mt-2 mb-2">
+                <input id="txtRetypePassword" class="form-control" aria-label="Input for Retyped Password" type="password" placeholder="Retype Password">
+                <label for="txtRetypePassword">Retype Password</label>
+            </div>
+
+            <hr class="mt-4 mb-4"/>
+            <button id="btnRegister" type="button" class="btn btn-primary col-12 mt-2">Register</button>
+            <div class="d-flex justify-content-center align-items-center">
+                Already have an account?
+                <button id="btnSwapLoginBottom" type="button" class="btn btn-link mb-0">Log in</button>
+            </div>
+        </div>
+    </form>
 
         <!-- Instructor Register Form -->
          <form id="frmInstructorRegister">
