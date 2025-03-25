@@ -209,9 +209,9 @@ document.querySelector('#btnRegister').addEventListener('click', function(){
         strMessage += '<p>Email is invalid</p>'
     }
 
-    if (strPassword.length < 6){
+    if (strPassword.length < 8){
         blnError = true
-        strMessage += '<p>Password must be at least 6 characters</p>'
+        strMessage += '<p>Password must be at least 8 characters</p>'
     }
 
     if (strPassword != strConfirmPassword){
