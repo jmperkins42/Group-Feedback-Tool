@@ -189,9 +189,13 @@ document.querySelector('#btnRegister').addEventListener('click', function(){
     // Retrieve the values from your registration form
     const strEmail = document.querySelector('#txtUsernameRegister').value.trim().toLowerCase()
     const strPassword = document.querySelector('#txtPasswordRegister').value
+    const strConfirmPassword = document.querySelector('#txtRetypePassword').value
     const strFirstName = document.querySelector('#txtFirstName').value
+    const strMiddleName = document.querySelector('#txtMiddleName').value
     const strLastName = document.querySelector('#txtLastName').value
     const strPhoneNumber = document.querySelector('#txtPhoneNumber').value
+    const strDiscordName = document.querySelector('#txtDiscordName').value
+    const strTeamsEmail = document.querySelector('#txtTeamsEmail').value
     const strOrgType = document.querySelector('#cboOrgType').value
     const strOrgName = document.querySelector('#txtOrgName').value
     const strGroupCode = document.querySelector('#txtGroupCode').value
@@ -210,6 +214,11 @@ document.querySelector('#btnRegister').addEventListener('click', function(){
         strMessage += '<p>Password must be at least 6 characters</p>'
     }
 
+    if (strPassword != strConfirmPassword){
+        blnError = true
+        strMessage += '<p>Passwords do not match</p>'
+    }
+
     if (strFirstName.length < 2){
         blnError = true
         strMessage += '<p>First name must be at least 2 characters</p>'
@@ -220,7 +229,7 @@ document.querySelector('#btnRegister').addEventListener('click', function(){
         strMessage += '<p>Last name must be at least 2 characters</p>'
     }
 
-    if (strPhoneNumber.length < 10){
+    if (strPhoneNumber.length < 10 || strPhoneNumber.length > 15){
         blnError = true
         strMessage += '<p>Phone Number is invalid</p>'
     }
@@ -232,13 +241,9 @@ document.querySelector('#btnRegister').addEventListener('click', function(){
 
     if (strOrgName.length < 2){
         blnError = true
-        strMessage += '<p>Organization name length must be at least 2 characters</p>'
+        strMessage += '<p>Please input an organization name</p>'
     }
 
-    if (strGroupCode.length < 2){
-        blnError = true
-        strMessage += '<p>Group code invalid</p>'
-    }
 
     if(blnError == true){
         Swal.fire({
