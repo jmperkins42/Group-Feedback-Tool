@@ -11,7 +11,7 @@
     <div class="d-flex mt-5 mb-5 justify-content-center align-items-center vh-70">
         <form id="frmLogin" class="card col-10 col-md-6 col-xl-4 mt-5 rounded-3">
             <div class="card-body shadow">
-                <h1 class="text-center text-primary fw-bold">Company</h1>
+                <h1 class="text-center text-primary fw-bold">SwollenHippo</h1>
                 <h3 class="text-center text-dark">Group Feedback Tool</h3>
                 
                 <div class="input-group mt-4 mb-3">
@@ -45,7 +45,7 @@
         <!-- Form to choose student or instructor -->
         <form id="frmChooseRole" class="card col-10 col-md-6 col-xl-4 mt-5" style="display:none;">
             <div class="card-body">
-                <h1 class="text-center text-primary fw-bold">Company</h1>
+                <h1 class="text-center text-primary fw-bold">SwollenHippo</h1>
                 <h3 class="text-center text-dark">Group Feedback Tool</h3>
                 <h5 class="text-center mt-4">Choose your role:</h3>
                 <button id="btnStudent" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3">Student</button>
@@ -58,7 +58,7 @@
         <!-- Student Register Form -->
         <form id="frmStudentRegister" class="card col-10 col-md-6 col-xl-4 mt-5" style="display:none;">
             <div class="card-body">
-                <h1 class="text-center text-primary fw-bold">Company</h1>
+                <h1 class="text-center text-primary fw-bold">SwollenHippo</h1>
                 <h3 class="text-center text-dark">Group Feedback Tool</h3>
                 <h5 class="text-center mt-4">Student Account Registration:</h5>
                 <div class="d-flex justify-content-center align-items-center">
@@ -205,9 +205,144 @@
         
 
         <!-- Instructor Register Form -->
-         <form id="frmInstructorRegister">
+         <form id="frmInstructorRegister" class="card col-10 col-md-6 col-xl-4 mt-5" style="display: none;">
+            <div class="card-body">
+                <h1 class="text-center text-primary fw-bold">SwollenHippo</h1>
+                <h3 class="text-center text-dark">Group Feedback Tool</h3>
+                <h5 class="text-center mt-4">Instructor Account Registration:</h5>
+                <div class="d-flex justify-content-center align-items-center">
+                    Already have an account?
+                    <button id="btnInstructorSwapLoginTop" type="button" class="btn btn-link mb-0">Log in</button>
+                </div>
+                
+                <h6 class="mt-3">Personal Information:</h6>
+        
+                <!-- First Name with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorFirstName" class="form-control shadow" aria-label="Input for First Name" type="text" placeholder="First Name">
+                        <label for="txtInstructorFirstName">First Name</label>
+                    </div>
+                </div>
+        
+                <!-- Middle Name with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorMiddleName" class="form-control shadow" aria-label="Input for Middle Name" type="text" placeholder="Middle Name">
+                        <label for="txtInstructorMiddleName">Middle Name (Optional)</label>
+                    </div>
+                </div>
+        
+                <!-- Last Name with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-vcard-fill"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorLastName" class="form-control shadow" aria-label="Input for Last Name" type="text" placeholder="Last Name">
+                        <label for="txInstructortLastName">Last Name</label>
+                    </div>
+                </div>
 
-         </form>
+                <hr/>
+        
+                <h6 class="mt-3">Contact Information:</h6>
+        
+                <!-- Phone Number with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorPhoneNumber" class="form-control shadow" aria-label="Input for Phone number" type="tel" placeholder="Phone number">
+                        <label for="txtInstructorPhoneNumber">Phone number</label>
+                    </div>
+                </div>
+        
+                <!-- Discord Name with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-discord"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorDiscordName" class="form-control shadow" aria-label="Input for Discord Name" type="text" placeholder="Discord Name (Optional)">
+                        <label for="txtInstructorDiscordName">Discord Name (Optional)</label>
+                    </div>
+                </div>
+        
+                <!-- Teams Email with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorTeamsEmail" class="form-control shadow" aria-label="Input for Teams Email" type="email" placeholder="Teams Email">
+                        <label for="txtInstructorTeamsEmail">Teams Email (Optional)</label>
+                    </div>
+                </div>
+
+                <hr/>
+        
+                <h6 class="mt-4">Organization Information:</h6>
+        
+                <!-- Organization Type with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <div class="form-floating">
+                        <select id="cboInstructorOrgType" class="form-control shadow" aria-label="Select your Organization Type">
+                            <option value="">Choose Organization Type</option>
+                            <option value="Company">Company</option>
+                            <option value="High School">High School</option>
+                            <option value="College">College</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <label for="cboOrgType">Organization Type</label>
+                    </div>
+                </div>
+        
+                <!-- Organization Name with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorOrgName" class="form-control shadow" aria-label="Input for Organization Name" type="text" placeholder="Organization Name">
+                        <label for="txtInstructorOrgName">Organization Name</label>
+                    </div>
+                </div>
+
+                <hr/>
+        
+                <h6 class="mt-4">Account Information:</h6>
+        
+                <!-- Username with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorUsernameRegister" class="form-control shadow" aria-label="Input for Username" type="email" placeholder="johndoe@email.com">
+                        <label for="txtInstructorUsernameRegister">Email</label>
+                    </div>
+                </div>
+        
+                <!-- Password with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorPasswordRegister" class="form-control shadow" aria-label="Input for Password" type="password" placeholder="Password">
+                        <label for="txtInstructorPasswordRegister">Password</label>
+                    </div>
+                </div>
+        
+                <!-- Retype Password with Icon -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <div class="form-floating">
+                        <input id="txtInstructorRetypePassword" class="form-control shadow" aria-label="Input for Retyped Password" type="password" placeholder="Retype Password">
+                        <label for="txtInstructorRetypePassword">Retype Password</label>
+                    </div>
+                </div>
+        
+                <hr class="mt-4 mb-4"/>
+                <button id="btnInstructorRegister" type="button" class="btn btn-primary bg-gradient col-12 mt-2">Register</button>
+                <div class="d-flex justify-content-center align-items-center">
+                    Already have an account?
+                    <button id="btnInstructorSwapLoginBottom" type="button" class="btn btn-link mb-0">Log in</button>
+                </div>
+            </div>
+        </form>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

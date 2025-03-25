@@ -58,6 +58,17 @@ document.querySelector('#btnInstructor').addEventListener('click', function(){
     document.querySelector('#frmInstructorRegister').style.display = 'block'
 })
 
+// click event for btnSwapLogin to hide frmRegister and show frmLogin
+document.querySelector('#btnInstructorSwapLoginTop').addEventListener('click', function(){
+    document.querySelector('#frmInstructorRegister').style.display = 'none'
+    document.querySelector('#frmLogin').style.display = 'block'
+})
+
+document.querySelector('#btnInstructorSwapLoginBottom').addEventListener('click', function(){
+    document.querySelector('#frmInstructorRegister').style.display = 'none'
+    document.querySelector('#frmLogin').style.display = 'block'
+})
+
 
 // click event for btnLogin
 document.querySelector('#btnLogin').addEventListener('click', function(){
