@@ -243,16 +243,16 @@
             <h3 id="txtTeamMemberName" class="text-dark">Team Member: </h3>
             <h6 class="mt-4">Please provide a rating for this team member:</h6>
             <div class="form-floating col-2">
-                <input id="txtReviewScore" class="form-control shadow" aria-label="Input for Review Score" type="text" placeholder="Review Score">
+                <input id="txtReviewScore" class="form-control shadow review-question" aria-label="Input for Review Score" type="text" placeholder="Review Score">
                 <label for="txtReviewScore">Score (1-10)</label>
             </div>
             <h6 class="mt-4">Please provide any public feedback you have for this team member. Keep in mind, they may see this feedback so focus on being constructive with the goal to improve.</h6>
             <div class="form-floating">
-                <textarea id="txtPublicFeedback" class="form-control shadow" aria-label="Input for Public Feedback" type="text" placeholder="Public Feedback" style="height: 150px;"></textarea>
+                <textarea id="txtPublicFeedback" class="form-control shadow review-question" aria-label="Input for Public Feedback" type="text" placeholder="Public Feedback" style="height: 150px;"></textarea>
             </div>
             <h6 class="mt-4">Please provide any private feedback you have for this team member. This feedback will never be seen by the team member, so please be honest.</h6>
             <div class="form-floating">
-                <textarea id="txtPrivateFeedback" class="form-control shadow" aria-label="Input for Private Feedback" type="text" placeholder="Private Feedback" style="height: 150px;"></textarea>
+                <textarea id="txtPrivateFeedback" class="form-control shadow review-question" aria-label="Input for Private Feedback" type="text" placeholder="Private Feedback" style="height: 150px;"></textarea>
             </div>
             <!-- Place to dynamically create questions -->
             <hr class="mt-4 mb-4"/>
@@ -336,13 +336,16 @@
             document.getElementById('frmTeamMemberReview').classList.add('d-none');
         });
 
+        // variables for testing review format
+        let teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
+        let currentMemberIndex = 0;
+
+        
         // Handle "Start Review" button click
         document.querySelectorAll('.btn-start-review').forEach(button => {
             button.addEventListener('click', () => {
                 const courseCard = button.closest('.card');
                 const courseName = courseCard.querySelector('.card-title').textContent;
-                const teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
-                let currentMemberIndex = 0;
                 const teamMemberName = teamMemberNames[currentMemberIndex];
                 // Populate review form
                 document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
@@ -350,20 +353,50 @@
                 // Hide review options and show review form
                 document.getElementById('divReviewOptions').classList.add('d-none');
                 document.getElementById('frmTeamMemberReview').classList.remove('d-none');
+
+                // Reset form fields
+                if (teamMemberNames.length > 1) {
+                    document.getElementById('btnNextTeamMember').classList.remove('d-none');
+                    document.getElementById('btnSubmitReview').classList.add('d-none');
+                } else {
+                    document.getElementById('btnNextTeamMember').classList.add('d-none');
+                    document.getElementById('btnSubmitReview').classList.remove('d-none');
+                }
             });
         });
 
         // Handle "Next Team Member" button click
         document.getElementById('btnNextTeamMember').addEventListener('click', () => {
-            const teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
-            let currentMemberIndex = 0;
+            const reviewScore = document.getElementById('txtReviewScore').value;
+            const publicFeedback = document.getElementById('txtPublicFeedback').value;
+            const privateFeedback = document.getElementById('txtPrivateFeedback').value;
+            console.log("onto the next!")
+            // Validate inputs
+            if (!reviewScore || !publicFeedback || !privateFeedback) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please fill in all fields before proceeding to the next team member.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // build in a way to save the current review to database or file
+
             currentMemberIndex++;
             if (currentMemberIndex < teamMemberNames.length) {
                 const teamMemberName = teamMemberNames[currentMemberIndex];
                 document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
             } else {
-                alert("No more team members to review.");
+                // If no more team members, show submit button and hide next button
+                document.getElementById('btnNextTeamMember').classList.add('d-none');
+                document.getElementById('btnSubmitReview').classList.remove('d-none');
             }
+            // Reset form fields
+            document.querySelectorAll('.review-question').forEach(input => {
+                input.value = '';
+            });
         });
 
         // Handle "Submit Review" button click
@@ -371,14 +404,21 @@
             const reviewScore = document.getElementById('txtReviewScore').value;
             const publicFeedback = document.getElementById('txtPublicFeedback').value;
             const privateFeedback = document.getElementById('txtPrivateFeedback').value;
+            // build in a way to save the current review to database or file
 
             // Validate inputs
             if (!reviewScore || !publicFeedback || !privateFeedback) {
-                alert("Please fill in all fields.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please fill in all fields before proceeding to the next team member.',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
 
-            // Submit review (this should be an AJAX call to the server)
+            // Submit review to the server or save it locally
+
             Swal.fire({
                 icon: 'success',
                 title: 'Review Submitted',
