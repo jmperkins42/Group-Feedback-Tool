@@ -156,7 +156,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
                                 </td>
                                 
                             </tr>
@@ -176,7 +176,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
                                 </td>
                             </tr>
                             <tr>
@@ -195,7 +195,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -419,7 +419,52 @@
         </div>
     </div>
 
-    <!-- Create Review Modal -->
+    <!-- Create Individual Review Modal -->
+    <div class="modal fade" id="createIndividualReviewModal" tabindex="-1" aria-labelledby="createIndividualReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createIndividualReviewModalLabel">Create New Review for Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createIndividualReviewForm">
+                        <!-- Review Title -->
+                        <div class="mb-3">
+                            <label for="txtIndividualReviewTitle" class="form-label">Review Title</label>
+                            <input type="text" class="form-control" id="txtIndividualReviewTitle" placeholder="Enter review title" required>
+                        </div>
+
+                        <!-- Add Questions Section -->
+                        <h5>Questions</h5>
+                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddIndividualQuestion">
+                            <i class="bi bi-plus-circle"></i> Add Question
+                        </button>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tblIndividualQuestions">
+                                <thead>
+                                    <tr>
+                                        <th>Question Type</th>
+                                        <th>Question</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically Added Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnCreateIndividualReview">Create Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Create Team Review Modal -->
     <div class="modal fade" id="createReviewModal" tabindex="-1" aria-labelledby="createReviewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -685,6 +730,40 @@
                 newRow.remove();
             });
         });
+
+        // INDIVIDUAL REVIEW BLOCK START
+        // Add Question Button Click
+        document.getElementById('btnAddIndividualQuestion').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblIndividualQuestions tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <select class="form-select">
+                        <option value="short-answer">Short Answer</option>
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="likert">Likert</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control" placeholder="Enter question" required>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveQuestion">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveQuestion').addEventListener('click', () => {
+                newRow.remove();
+            });
+        });
+
+        // INDIVIDUAL REVIEW BLOCK END
 
 
         // Add Question Button Click
