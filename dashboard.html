@@ -235,7 +235,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
                                 </td>
                             </tr>
 
@@ -347,7 +347,50 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Create Review Modal -->
+    <div class="modal fade" id="createReviewModal" tabindex="-1" aria-labelledby="createReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createReviewModalLabel">Create New Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createReviewForm">
+                        <!-- Review Title -->
+                        <div class="mb-3">
+                            <label for="txtReviewTitle" class="form-label">Review Title</label>
+                            <input type="text" class="form-control" id="txtReviewTitle" placeholder="Enter review title" required>
+                        </div>
+
+                        <!-- Add Questions Section -->
+                        <h5>Questions</h5>
+                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddQuestion">
+                            <i class="bi bi-plus-circle"></i> Add Question
+                        </button>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tblQuestions">
+                                <thead>
+                                    <tr>
+                                        <th>Question Type</th>
+                                        <th>Question</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically Added Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnCreateReview">Create Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -364,10 +407,6 @@
                 ordering: true,
                 info: true,
                 lengthChange: true,
-                columnDefs: [
-                    { width: '5%', targets: 4 },
-                    { width: '15%', targets: 5 }
-                ]
             });
             $('#tblTeams').DataTable({
                 paging: true,
@@ -375,10 +414,6 @@
                 ordering: true,
                 info: true,
                 lengthChange: true,
-                columnDefs: [
-                    { width: '5%', targets: 3 },
-                    { width: '15%', targets: 4 }
-                ]
             });
         });
         
@@ -435,6 +470,61 @@
                     text: 'Please fill in all fields.',
                 });
             }
+        });
+
+        // Add Team Member Button Click
+        document.getElementById('btnAddTeamMember').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblTeamMembers tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td><input type="text" class="form-control" placeholder="Enter member name" required></td>
+                <td><input type="email" class="form-control" placeholder="Enter member email" required></td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveMember">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveMember').addEventListener('click', () => {
+                newRow.remove();
+            });
+        });
+
+
+        // Add Question Button Click
+        document.getElementById('btnAddQuestion').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblQuestions tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <select class="form-select">
+                        <option value="short-answer">Short Answer</option>
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="likert">Likert</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control" placeholder="Enter question" required>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveQuestion">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveQuestion').addEventListener('click', () => {
+                newRow.remove();
+            });
         });
     </script>
 </body>
