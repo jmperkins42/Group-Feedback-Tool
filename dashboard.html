@@ -228,7 +228,7 @@
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="teamActionsDropdown">
-                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
+                                        <li><button class="dropdown-item btn-edit-team" data-bs-toggle="modal" data-bs-target="#editTeamModal"><i class="bi bi-pencil"></i> Edit</button></li>
                                         <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
                                     </ul>
                                 </td>
@@ -270,6 +270,50 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveStudentGradeBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Team Modal -->
+    <div class="modal fade" id="editTeamModal" tabindex="-1" aria-labelledby="editTeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTeamModalLabel">Edit Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTeamForm">
+                        <!-- Team Name -->
+                        <div class="mb-3">
+                            <label for="editTeamName" class="form-label">Team Name</label>
+                            <input type="text" class="form-control" id="editTeamName" placeholder="Enter team name" required>
+                        </div>
+
+                        <!-- Edit Members Section -->
+                        <h5>Team Members</h5>
+                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnEditAddTeamMember">
+                            <i class="bi bi-plus-circle"></i> Add Member
+                        </button>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tblEditTeamMembers">
+                                <thead>
+                                    <tr>
+                                        <th>Member Name</th>
+                                        <th>Email</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically Added Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnSaveTeamChanges">Save Changes</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -503,6 +547,65 @@
 
                 document.getElementById('editStudentName').value = studentName;
                 document.getElementById('editStudentGrade').value = studentGrade;
+            });
+        });
+
+
+        // Edit Team Modal autofill and functionality
+        document.querySelectorAll('.btn-edit-team').forEach(button => {
+            button.addEventListener('click', () => {
+                const row = button.closest('tr');
+                const teamName = row.cells[1].textContent;
+                const teamMembers = row.cells[2].textContent.split(', ');
+
+                document.getElementById('editTeamName').value = teamName;
+
+                // Clear existing members
+                const tableBody = document.querySelector('#tblEditTeamMembers tbody');
+                tableBody.innerHTML = '';
+
+                // Populate team members
+                teamMembers.forEach(member => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td><input type="text" class="form-control" value="${member}" required></td>
+                        <td><input type="email" class="form-control" placeholder="Enter member email" required></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger btnRemoveMember">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+
+                    // Add event listener to the remove button
+                    newRow.querySelector('.btnRemoveMember').addEventListener('click', () => {
+                        newRow.remove();
+                    });
+                });
+            });
+        });
+
+        // Add Team Member in Edit Team Modal
+        document.getElementById('btnEditAddTeamMember').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblEditTeamMembers tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td><input type="text" class="form-control" placeholder="Enter member name" required></td>
+                <td><input type="email" class="form-control" placeholder="Enter member email" required></td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveMember">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveMember').addEventListener('click', () => {
+                newRow.remove();
             });
         });
 
