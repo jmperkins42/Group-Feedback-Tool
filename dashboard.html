@@ -32,10 +32,9 @@
                         <i class="bi bi-person-circle"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><button class="dropdown-item" id="btnOpenSettingsModal" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</button></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                        <li><button class="dropdown-item" href="#">Logout</button></li>
                     </ul>
             </div>
         </div>
@@ -123,128 +122,206 @@
                     <P>Number of Students: <span id="numberOfStudents">30</span></P>
                 </div>
                 <!-- Students Tab -->
-                <div class="tab-pane fade" id="tabStudents" role="tabpanel" aria-labelledby="students-tab">
+                <div class="tab-pane fade table-container" id="tabStudents" role="tabpanel" aria-labelledby="students-tab">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2>Students</h2>
                         <button class="btn btn-success" id="btnAddStudent" data-bs-toggle="modal" data-bs-target="#addStudentModal"><i class="bi bi-plus-circle"></i> Add Student</button>
                     </div>
-                    <table class="table table-striped" id="tblStudents">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Grade</th>
-                                <th>Actions</th>
-                                <th>Reviews</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                            <!-- Dynamically filled rows -->
-                            <tr>
-                                <td>1</td>
-                                <td>John Doe</td>
-                                <td>johndoe@example.com</td>
-                                <td>90%</td>
-                                <td>
-                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Jane Smith</td>
-                                <td>janesmith@example.com</td>
-                                <td>85%</td>
-                                <td>
-                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Emily Johnson</td>
-                                <td>emilyjohnson@example.com</td>
-                                <td>88%</td>
-                                <td>
-                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tblStudents">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Grade</th>
+                                    <th>Actions</th>
+                                    <th>Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Dynamically filled rows -->
+                                <tr>
+                                    <td>1</td>
+                                    <td>John Doe</td>
+                                    <td>johndoe@example.com</td>
+                                    <td>90%</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
+                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
+                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-eye"></i> View Reviews</button>
+                                        <button class="btn btn-sm btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
+                                    </td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Jane Smith</td>
+                                    <td>janesmith@example.com</td>
+                                    <td>85%</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
+                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
+                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
+                                        <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Emily Johnson</td>
+                                    <td>emilyjohnson@example.com</td>
+                                    <td>88%</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
+                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
+                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
+                                        <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+    
+                    </div>
                 </div>
                 <!-- Teams Tab -->
-                <div class="tab-pane fade" id="tabTeams" role="tabpanel" aria-labelledby="teams-tab">
+                <div class="tab-pane fade table-container" id="tabTeams" role="tabpanel" aria-labelledby="teams-tab">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2>Teams</h2>
                         <button class="btn btn-success" id="btnAddTeam" data-bs-toggle="modal" data-bs-target="#createTeamModal"><i class="bi bi-plus-circle"></i> Add Team</button>
                     </div>
-                    <table class="table table-striped" id="tblTeams">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Team Name</th>
-                                <th>Members</th>
-                                <th>Actions</th>
-                                <th>Reviews</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teamsTableBody">
-                            <!-- Dynamically filled rows -->
-                            <tr>
-                                <td>1</td>
-                                <td>Team Alpha</td>
-                                <td>John Doe, Jane Smith</td>
-                                <td>
-                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="teamActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="teamActionsDropdown">
-                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
-                                        <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#createReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tblTeams">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team Name</th>
+                                    <th>Members</th>
+                                    <th>Actions</th>
+                                    <th>Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamsTableBody">
+                                <!-- Dynamically filled rows -->
+                                <tr>
+                                    <td>1</td>
+                                    <td>Team Alpha</td>
+                                    <td>John Doe, Jane Smith</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="teamActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="teamActionsDropdown">
+                                            <li><button class="dropdown-item btn-edit-team" data-bs-toggle="modal" data-bs-target="#editTeamModal"><i class="bi bi-pencil"></i> Edit</button></li>
+                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-eye"></i> View Reviews</button>
+                                        <button class="btn btn-sm btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#createReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
+                                    </td>
+                                </tr>
+    
+                            </tbody>
+                        </table>
+    
+                    </div>
                 </div>
             </div>
             <!-- Back Button -->
             <button class="btn btn-secondary mt-3" id="backToDashboard">Back to Course List</button>
+        </div>
+    </div>
+
+    <!-- Edit Student Grade Modal -->
+    <div class="modal fade" id="editStudentGradeModal" tabindex="-1" aria-labelledby="editStudentGradeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentGradeModalLabel">Edit Student Grade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentGradeForm">
+                        <div class="mb-3">
+                            <label for="editStudentName" class="form-label">Student Name</label>
+                            <input type="text" class="form-control" id="editStudentName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStudentGrade" class="form-label">Grade</label>
+                            <input type="text" class="form-control" id="editStudentGrade" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveStudentGradeBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Team Modal -->
+    <div class="modal fade" id="editTeamModal" tabindex="-1" aria-labelledby="editTeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTeamModalLabel">Edit Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTeamForm">
+                        <!-- Team Name -->
+                        <div class="mb-3">
+                            <label for="editTeamName" class="form-label">Team Name</label>
+                            <input type="text" class="form-control" id="editTeamName" placeholder="Enter team name" required>
+                        </div>
+
+                        <!-- Edit Members Section -->
+                        <h5>Team Members</h5>
+                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnEditAddTeamMember">
+                            <i class="bi bi-plus-circle"></i> Add Member
+                        </button>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tblEditTeamMembers">
+                                <thead>
+                                    <tr>
+                                        <th>Member Name</th>
+                                        <th>Email</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically Added Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnSaveTeamChanges">Save Changes</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -348,12 +425,57 @@
         </div>
     </div>
 
-    <!-- Create Review Modal -->
+    <!-- Create Individual Review Modal -->
+    <div class="modal fade" id="createIndividualReviewModal" tabindex="-1" aria-labelledby="createIndividualReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createIndividualReviewModalLabel">Create New Review for Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createIndividualReviewForm">
+                        <!-- Review Title -->
+                        <div class="mb-3">
+                            <label for="txtIndividualReviewTitle" class="form-label">Review Title</label>
+                            <input type="text" class="form-control" id="txtIndividualReviewTitle" placeholder="Enter review title" required>
+                        </div>
+
+                        <!-- Add Questions Section -->
+                        <h5>Questions</h5>
+                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddIndividualQuestion">
+                            <i class="bi bi-plus-circle"></i> Add Question
+                        </button>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tblIndividualQuestions">
+                                <thead>
+                                    <tr>
+                                        <th>Question Type</th>
+                                        <th>Question</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically Added Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-success" id="btnCreateIndividualReview">Create Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Create Team Review Modal -->
     <div class="modal fade" id="createReviewModal" tabindex="-1" aria-labelledby="createReviewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createReviewModalLabel">Create New Review</h5>
+                    <h5 class="modal-title" id="createReviewModalLabel">Create New Review for Team</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -392,6 +514,45 @@
         </div>
     </div>
 
+    <!-- User Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">User Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div class="mb-3">
+                            <label for="SettingsFirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="SettingsFirstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="SettingsLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="SettingsLastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="SettingsEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="SettingsEmail" required>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger mb-3" id="btnChangePassword">Change Password</button>
+                        <div class="mb-3" id="passwordFields" style="display: none;">
+                            <label for="SettingsPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="SettingsPassword" required>
+                            <label for="SettingsCnfrmPassword" class="form-label mt-2">Confirm Password</label>
+                            <input type="password" class="form-control" id="SettingsCnfrmPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="saveEditSettingsBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -417,6 +578,87 @@
             });
         });
         
+
+        // Show password fields when "Change Password" button is clicked
+        document.getElementById('btnChangePassword').addEventListener('click', () => {
+            const passwordFields = document.getElementById('passwordFields');
+            if (passwordFields.style.display === 'none') {
+                passwordFields.style.display = 'block';
+            } else {
+                passwordFields.style.display = 'none';
+            }
+        });
+
+        // Edit Student Grade autofill
+        document.querySelectorAll('#tblStudents .btn-light').forEach(button => {
+            button.addEventListener('click', () => {
+                const row = button.closest('tr');
+                const studentName = row.cells[1].textContent;
+                const studentGrade = row.cells[3].textContent;
+
+                document.getElementById('editStudentName').value = studentName;
+                document.getElementById('editStudentGrade').value = studentGrade;
+            });
+        });
+
+
+        // Edit Team Modal autofill and functionality
+        document.querySelectorAll('.btn-edit-team').forEach(button => {
+            button.addEventListener('click', () => {
+                const row = button.closest('tr');
+                const teamName = row.cells[1].textContent;
+                const teamMembers = row.cells[2].textContent.split(', ');
+
+                document.getElementById('editTeamName').value = teamName;
+
+                // Clear existing members
+                const tableBody = document.querySelector('#tblEditTeamMembers tbody');
+                tableBody.innerHTML = '';
+
+                // Populate team members
+                teamMembers.forEach(member => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td><input type="text" class="form-control" value="${member}" required></td>
+                        <td><input type="email" class="form-control" placeholder="Enter member email" required></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger btnRemoveMember">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+
+                    // Add event listener to the remove button
+                    newRow.querySelector('.btnRemoveMember').addEventListener('click', () => {
+                        newRow.remove();
+                    });
+                });
+            });
+        });
+
+        // Add Team Member in Edit Team Modal
+        document.getElementById('btnEditAddTeamMember').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblEditTeamMembers tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td><input type="text" class="form-control" placeholder="Enter member name" required></td>
+                <td><input type="email" class="form-control" placeholder="Enter member email" required></td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveMember">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveMember').addEventListener('click', () => {
+                newRow.remove();
+            });
+        });
 
 
         // Handle "View Details" button click
@@ -494,6 +736,40 @@
                 newRow.remove();
             });
         });
+
+        // INDIVIDUAL REVIEW BLOCK START
+        // Add Question Button Click
+        document.getElementById('btnAddIndividualQuestion').addEventListener('click', () => {
+            const tableBody = document.querySelector('#tblIndividualQuestions tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <select class="form-select">
+                        <option value="short-answer">Short Answer</option>
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="likert">Likert</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control" placeholder="Enter question" required>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger btnRemoveQuestion">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            // Add event listener to the remove button
+            newRow.querySelector('.btnRemoveQuestion').addEventListener('click', () => {
+                newRow.remove();
+            });
+        });
+
+        // INDIVIDUAL REVIEW BLOCK END
 
 
         // Add Question Button Click
