@@ -20,10 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
+                        <a class="nav-link" id="navCourses" href="#">Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Reviews</a>
+                        <a class="nav-link" id="navReview" href="#">Reviews</a>
                     </li>
                 </ul>
                 <!-- Dropdown button for account -->
@@ -47,44 +47,47 @@
     </div>
 
     <!-- Main content area -->
-    <div class="container mb-4">
-
-        <div class="row row-cols-1 row-cols-md-3 g-4" id="divCourseCards">
-            
-            <!-- Card 1 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">CSC 3100</h5>
-                        <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
+    <div class="container-fluid mb-4" id="divCourseCards">
+        <h2 class="mb-4">My Courses</h2>
+        <div class="bg-light p-4 shadow-lg">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+    
+                <!-- Card 1 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">CSC 3100</h5>
+                            <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">Course 2</h5>
-                        <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
+                <!-- Card 2 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 2</h5>
+                            <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">Course 3</h5>
-                        <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
+                <!-- Card 3 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 3</h5>
+                            <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>
                     </div>
                 </div>
+    
+                <!-- Dynamically filled cards -->
+                
             </div>
-
-            <!-- Dynamically filled cards -->
-            
         </div>
+        
 
 
     </div>
@@ -126,7 +129,8 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Reviews</th>
+                                <th>Team Name</th>
+                                <th>Team #</th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody">
@@ -135,26 +139,23 @@
                                 <td>1</td>
                                 <td>John Doe</td>
                                 <td>johndoe@example.com</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
+                                <td>Team Alpha</td>
+                                <td>1</td>
                                 
                             </tr>
                             <tr>
                                 <td>2</td>
                                 <td>Jane Smith</td>
                                 <td>janesmith@example.com</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
+                                <td>Team Alpha</td>
+                                <td>1</td>
                             </tr>
                             <tr>
                                 <td>3</td>
                                 <td>Emily Johnson</td>
                                 <td>emilyjohnson@example.com</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
-                                </td>
+                                <td>N/A</td>
+                                <td>N/A</td>
                             </tr>
                         </tbody>
                     </table>
@@ -180,7 +181,7 @@
                                 <td>Team Alpha</td>
                                 <td>John Doe, Jane Smith</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Feedback</button>
                                 </td>
                             </tr>
 
@@ -194,12 +195,74 @@
     </div>
 
     <!-- Review Details View -->
-    <div id="reviewpage" class="container-fluid d-none">
+    <div id="divReviewOptions" class="container-fluid mb-4 d-none">
         <div class="bg-light p-4 shadow-lg">
             <h2>Review Details</h2>
-            <p>Details about the review go here.</p>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+    
+                <!-- Card 1 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">CSC 3100</h5>
+                            <p class="card-text">Review Unavailable</p>
+                            <button class="btn btn-primary btn-start-review d-none">Start Review</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 2</h5>
+                            <p class="card-text">Review Available</p>
+                            <button class="btn btn-primary btn-start-review">Start Review</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 3</h5>
+                            <p class="card-text">Review Unavailable</p>
+                            <button class="btn btn-primary btn-start-review d-none">Start Review</button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Dynamically filled cards -->
+            </div>
         </div>
+    </div>
 
+    <!-- Team Member Review Form -->
+    <form id="frmTeamMemberReview" class="container-fluid col-10 mt-5 d-none">
+        <div class="card-body">
+            <h1 class="text-center text-primary fw-bold">Review</h1>
+            <h3 id="txtTeamMemberName" class="text-dark">Team Member: </h3>
+            <h6 class="mt-4">Please provide a rating for this team member:</h6>
+            <div class="form-floating col-2">
+                <input id="txtReviewScore" class="form-control shadow" aria-label="Input for Review Score" type="text" placeholder="Review Score">
+                <label for="txtReviewScore">Score (1-10)</label>
+            </div>
+            <h6 class="mt-4">Please provide any public feedback you have for this team member. Keep in mind, they may see this feedback so focus on being constructive with the goal to improve.</h6>
+            <div class="form-floating">
+                <textarea id="txtPublicFeedback" class="form-control shadow" aria-label="Input for Public Feedback" type="text" placeholder="Public Feedback" style="height: 150px;"></textarea>
+            </div>
+            <h6 class="mt-4">Please provide any private feedback you have for this team member. This feedback will never be seen by the team member, so please be honest.</h6>
+            <div class="form-floating">
+                <textarea id="txtPrivateFeedback" class="form-control shadow" aria-label="Input for Private Feedback" type="text" placeholder="Private Feedback" style="height: 150px;"></textarea>
+            </div>
+            <!-- Place to dynamically create questions -->
+            <hr class="mt-4 mb-4"/>
+            <small class="mt-4">Please review your answers before submitting, as you cannot return once you have submitted or moved to the next team member.</small>
+            <button id="btnNextTeamMember" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3 d-none">Next Team Member</button>
+            <button id="btnSubmitReview" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3">Submit Review</button>
+            <button id="btnBackToLoginFromReview" type="button" class="btn btn-link col-12 mt-2">Go Back</button>
+        </div>
+    </form>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -216,8 +279,8 @@
                 info: true,
                 lengthChange: true,
                 columnDefs: [
-                    { width: '5%', targets: 3 },
-                    { width: '15%', targets: 3 }
+                    { width: '5%', targets: 4 },
+                    { width: '15%', targets: 4 }
                 ]
             });
             $('#tblTeams').DataTable({
@@ -227,7 +290,7 @@
                 info: true,
                 lengthChange: true,
                 columnDefs: [
-                    { width: '5%', targets: 3 },
+                    { width: '5%', targets: 3  },
                     { width: '15%', targets: 3 }
                 ]
             });
@@ -258,35 +321,77 @@
             document.getElementById('divCourseCards').classList.remove('d-none');
         });
 
-        // Add New Course Form Submission
-        document.getElementById('btnAddNewCourse').addEventListener('click', () => {
-            const courseName = document.getElementById('courseNameInput').value;
-            const courseDescription = document.getElementById('courseDescriptionInput').value;
+        // Switch to Review Page
+        document.querySelector('#navReview').addEventListener('click', () => {
+            document.getElementById('divCourseCards').classList.add('d-none');
+            document.getElementById('courseDetailsView').classList.add('d-none');
+            document.getElementById('frmTeamMemberReview').classList.add('d-none');
+            document.getElementById('divReviewOptions').classList.remove('d-none');
+        });
 
-            // Validate form inputs
-            if (courseName && courseDescription) {
-                // SEND DATA TO SERVER
+        // Switch back to Course Page from Review Page
+        document.querySelector('#navCourses').addEventListener('click', () => {
+            document.getElementById('divReviewOptions').classList.add('d-none');
+            document.getElementById('divCourseCards').classList.remove('d-none');
+            document.getElementById('frmTeamMemberReview').classList.add('d-none');
+        });
 
-                // Then show success message
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Course Added',
-                    text: `Course "${courseName}" has been added successfully!`,
-                });
+        // Handle "Start Review" button click
+        document.querySelectorAll('.btn-start-review').forEach(button => {
+            button.addEventListener('click', () => {
+                const courseCard = button.closest('.card');
+                const courseName = courseCard.querySelector('.card-title').textContent;
+                const teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
+                let currentMemberIndex = 0;
+                const teamMemberName = teamMemberNames[currentMemberIndex];
+                // Populate review form
+                document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
 
-                // Reset form and close modal
-                document.getElementById('addCourseForm').reset();
-                const addCourseModal = bootstrap.Modal.getInstance(document.getElementById('addCourseModal'));
-                addCourseModal.hide();
+                // Hide review options and show review form
+                document.getElementById('divReviewOptions').classList.add('d-none');
+                document.getElementById('frmTeamMemberReview').classList.remove('d-none');
+            });
+        });
+
+        // Handle "Next Team Member" button click
+        document.getElementById('btnNextTeamMember').addEventListener('click', () => {
+            const teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
+            let currentMemberIndex = 0;
+            currentMemberIndex++;
+            if (currentMemberIndex < teamMemberNames.length) {
+                const teamMemberName = teamMemberNames[currentMemberIndex];
+                document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
             } else {
-                // Show error message
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Please fill in all fields.',
-                });
+                alert("No more team members to review.");
             }
         });
+
+        // Handle "Submit Review" button click
+        document.getElementById('btnSubmitReview').addEventListener('click', () => {
+            const reviewScore = document.getElementById('txtReviewScore').value;
+            const publicFeedback = document.getElementById('txtPublicFeedback').value;
+            const privateFeedback = document.getElementById('txtPrivateFeedback').value;
+
+            // Validate inputs
+            if (!reviewScore || !publicFeedback || !privateFeedback) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Submit review (this should be an AJAX call to the server)
+            Swal.fire({
+                icon: 'success',
+                title: 'Review Submitted',
+                text: 'Your review has been submitted successfully!',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Reset form and go back to course list
+                document.getElementById('frmTeamMemberReview').classList.add('d-none');
+                document.getElementById('divCourseCards').classList.remove('d-none');
+            });
+        });
+
+        
     </script>
 </body>
 </html>
