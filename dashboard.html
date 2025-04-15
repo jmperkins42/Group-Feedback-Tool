@@ -23,9 +23,6 @@
                         <a class="nav-link" href="#">Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Teams</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="#">Reviews</a>
                     </li>
                 </ul>
@@ -223,6 +220,25 @@
                         </thead>
                         <tbody id="teamsTableBody">
                             <!-- Dynamically filled rows -->
+                            <tr>
+                                <td>1</td>
+                                <td>Team Alpha</td>
+                                <td>John Doe, Jane Smith</td>
+                                <td>
+                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="teamActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="teamActionsDropdown">
+                                        <li><button class="dropdown-item"><i class="bi bi-pencil"></i> Edit</button></li>
+                                        <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2"><i class="bi bi-envelope"></i> Send Review</button>
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
