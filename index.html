@@ -153,15 +153,6 @@
                         <label for="txtOrgName">Organization Name</label>
                     </div>
                 </div>
-        
-                <!-- Group Code with Icon -->
-                <div class="input-group mb-3">
-                    <span class="input-group-text"><i class="bi bi-chat-right-quote-fill"></i></span>
-                    <div class="form-floating">
-                        <input id="txtGroupCode" class="form-control shadow" aria-label="Input for Optional Group Code" type="text" placeholder="Group Code (optional, if joining a group)">
-                        <label for="txtGroupCode">Group Code (optional, if joining a group)</label>
-                    </div>
-                </div>
 
                 <hr/>
         
@@ -340,30 +331,6 @@
                     Already have an account?
                     <button id="btnInstructorSwapLoginBottom" type="button" class="btn btn-link mb-0">Log in</button>
                 </div>
-            </div>
-        </form>
-
-        <!-- Team Member Review Form -->
-        <form id="frmTeamMemberReview" class="card col-10 col-md-6 mt-5" style="display: none;">
-            <div class="card-body">
-                <h1 class="text-center text-primary fw-bold">Review</h1>
-                <h3 id="txtTeamMemberName" class="text-dark">Team Member: </h3>
-                <h6 class="mt-4">Please provide a rating for this team member:</h6>
-                <div class="form-floating col-2">
-                    <input id="txtReviewScore" class="form-control shadow" aria-label="Input for Review Score" type="text" placeholder="Review Score">
-                    <label for="txtReviewScore">Score (1-10)</label>
-                </div>
-                <h6 class="mt-4">Please provide any public feedback you have for this team member. Keep in mind, they may see this feedback so focus on being constructive with the goal to improve.</h6>
-                <div class="form-floating">
-                    <textarea id="txtPublicFeedback" class="form-control shadow" aria-label="Input for Public Feedback" type="text" placeholder="Public Feedback" style="height: 150px;"></textarea>
-                </div>
-                <h6 class="mt-4">Please provide any private feedback you have for this team member. This feedback will never be seen by the team member, so please be honest.</h6>
-                <div class="form-floating">
-                    <textarea id="txtPrivateFeedback" class="form-control shadow" aria-label="Input for Private Feedback" type="text" placeholder="Private Feedback" style="height: 150px;"></textarea>
-                </div>
-                <hr class="mt-4 mb-4"/>
-                <button id="btnSubmitReview" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3">Submit Review</button>
-                <button id="btnBackToLoginFromReview" type="button" class="btn btn-link col-12 mt-2">Go Back</button>
             </div>
         </form>
 
