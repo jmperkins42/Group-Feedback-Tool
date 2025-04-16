@@ -20,10 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Courses</a>
+                        <a class="nav-link" id="navCourses" href="#">Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Reviews</a>
+                        <a class="nav-link" id="navReviews" href="#">Reviews</a>
                     </li>
                 </ul>
                 <!-- Dropdown button for account -->
@@ -53,46 +53,45 @@
     </div>
 
     <!-- Main content area -->
-    <div class="container mb-4"></div>
+    <div class="container mb-4" id="divCourseCards">
+        <div class="bg-light p-4 shadow-lg">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                
+                <!-- Card 1 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">CSC 3100</h5>
+                            <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 2</h5>
+                            <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col">
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">Course 3</h5>
+                            <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
+                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                        </div>     
+                    </div>
+                </div>
 
-        <div class="row row-cols-1 row-cols-md-3 g-4" id="divCourseCards">
-            
-            <!-- Card 1 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">CSC 3100</h5>
-                        <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
-                    </div>
-                </div>
+                <!-- Dynamically filled cards -->
+                
             </div>
-            <!-- Card 2 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">Course 2</h5>
-                        <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
-                    </div>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="col">
-                <div class="card h-100 shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">Course 3</h5>
-                        <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
-                        <button class="btn btn-primary btn-view-course-details">View Details</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dynamically filled cards -->
-            
         </div>
-
-
     </div>
 
     <!-- Course Details View -->
@@ -552,7 +551,7 @@
             </div>
         </div>
     </div>
-
+        
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -802,6 +801,10 @@
                 newRow.remove();
             });
         });
+
+        document.querySelector('navCourses').addEventListener('click', () => {
+
+        }
     </script>
 </body>
 </html>

@@ -18,14 +18,6 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" id="navCourses" href="#">Courses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="navReview" href="#">Reviews</a>
-                    </li>
-                </ul>
                 <!-- Dropdown button for account -->
                 <div class="dropdown">
                     <button class="btn btn-lg btn-light dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -58,7 +50,11 @@
                         <div class="card-body">
                             <h5 class="card-title">CSC 3100</h5>
                             <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-primary col-3 btn-view-course-details">View Details</button>
+                                <p class="card-text italicize">Review Unavailable</p>
+                                <button class="btn btn-primary col-3 text-end btn-start-review d-none">Start Review</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,7 +64,11 @@
                         <div class="card-body">
                             <h5 class="card-title">Course 2</h5>
                             <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-primary col-3 btn-view-course-details">View Details</button>
+                                <p class="card-text italicize d-none">Review Unavailable</p>
+                                <button class="btn btn-primary col-3 text-end btn-start-review">Start Review</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,11 @@
                         <div class="card-body">
                             <h5 class="card-title">Course 3</h5>
                             <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button class="btn btn-primary col-3 btn-view-course-details">View Details</button>
+                                <p class="card-text italicize">Review Unavailable</p>
+                                <button class="btn btn-primary col-3 text-end btn-start-review d-none">Start Review</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -321,20 +325,6 @@
             document.getElementById('divCourseCards').classList.remove('d-none');
         });
 
-        // Switch to Review Page
-        document.querySelector('#navReview').addEventListener('click', () => {
-            document.getElementById('divCourseCards').classList.add('d-none');
-            document.getElementById('courseDetailsView').classList.add('d-none');
-            document.getElementById('frmTeamMemberReview').classList.add('d-none');
-            document.getElementById('divReviewOptions').classList.remove('d-none');
-        });
-
-        // Switch back to Course Page from Review Page
-        document.querySelector('#navCourses').addEventListener('click', () => {
-            document.getElementById('divReviewOptions').classList.add('d-none');
-            document.getElementById('divCourseCards').classList.remove('d-none');
-            document.getElementById('frmTeamMemberReview').classList.add('d-none');
-        });
 
         // variables for testing review format
         let teamMemberNames = ["John Doe", "Jane Smith"]; // This should be dynamically set based on the course and user's team members
@@ -351,7 +341,7 @@
                 document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
 
                 // Hide review options and show review form
-                document.getElementById('divReviewOptions').classList.add('d-none');
+                document.getElementById('divCourseCards').classList.add('d-none');
                 document.getElementById('frmTeamMemberReview').classList.remove('d-none');
 
                 // Reset form fields
@@ -432,7 +422,7 @@
             }).then(() => {
                 // Reset form and go back to course list
                 document.getElementById('frmTeamMemberReview').classList.add('d-none');
-                document.getElementById('divReviewOptions').classList.remove('d-none');
+                document.getElementById('divCourseCards').classList.remove('d-none');
                 document.querySelectorAll('.review-question').forEach(input => {
                     input.value = '';
                 });
@@ -442,7 +432,7 @@
         // Handle "Back to Reviews" button click
         document.getElementById('btnBackToReviewsFromReviewForm').addEventListener('click', () => {
             document.getElementById('frmTeamMemberReview').classList.add('d-none');
-            document.getElementById('divReviewOptions').classList.remove('d-none');
+            document.getElementById('divCourseCards').classList.remove('d-none');
             document.querySelectorAll('.review-question').forEach(input => {
                 input.value = '';
             });
