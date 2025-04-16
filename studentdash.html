@@ -259,7 +259,7 @@
             <small class="mt-4">Please review your answers before submitting, as you cannot return once you have submitted or moved to the next team member.</small>
             <button id="btnNextTeamMember" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3 d-none">Next Team Member</button>
             <button id="btnSubmitReview" type="button" class="btn btn-primary bg-gradient col-12 mt-2 rounded-3">Submit Review</button>
-            <button id="btnBackToLoginFromReview" type="button" class="btn btn-link col-12 mt-2">Go Back</button>
+            <button id="btnBackToReviewsFromReviewForm" type="button" class="btn btn-link col-12 mt-2">Go Back</button>
         </div>
     </form>
     
@@ -382,17 +382,22 @@
                 return;
             }
 
-            // build in a way to save the current review to database or file
+            // build in a way to save the current review to database or file here
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Review Submitted',
+                text: 'Your review has been submitted successfully!'
+            });
 
             currentMemberIndex++;
-            if (currentMemberIndex < teamMemberNames.length) {
-                const teamMemberName = teamMemberNames[currentMemberIndex];
-                document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
-            } else {
+            if (currentMemberIndex >= teamMemberNames.length - 1) {
                 // If no more team members, show submit button and hide next button
                 document.getElementById('btnNextTeamMember').classList.add('d-none');
                 document.getElementById('btnSubmitReview').classList.remove('d-none');
             }
+            const teamMemberName = teamMemberNames[currentMemberIndex];
+            document.getElementById('txtTeamMemberName').textContent = `Team Member: ${teamMemberName}`;
             // Reset form fields
             document.querySelectorAll('.review-question').forEach(input => {
                 input.value = '';
@@ -427,10 +432,21 @@
             }).then(() => {
                 // Reset form and go back to course list
                 document.getElementById('frmTeamMemberReview').classList.add('d-none');
-                document.getElementById('divCourseCards').classList.remove('d-none');
+                document.getElementById('divReviewOptions').classList.remove('d-none');
+                document.querySelectorAll('.review-question').forEach(input => {
+                    input.value = '';
+                });
             });
         });
 
+        // Handle "Back to Reviews" button click
+        document.getElementById('btnBackToReviewsFromReviewForm').addEventListener('click', () => {
+            document.getElementById('frmTeamMemberReview').classList.add('d-none');
+            document.getElementById('divReviewOptions').classList.remove('d-none');
+            document.querySelectorAll('.review-question').forEach(input => {
+                input.value = '';
+            });
+        });
         
     </script>
 </body>
