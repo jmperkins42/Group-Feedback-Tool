@@ -40,7 +40,7 @@
 
     <!-- Main content area -->
     <div class="container-fluid mb-4" id="divCourseCards">
-        <h2 class="mb-4">My Courses</h2>
+        <h2 class="mt-4 mb-4">My Courses</h2>
         <div class="bg-light p-4 shadow-lg">
             <div class="row row-cols-1 row-cols-md-3 g-4">
     
@@ -109,6 +109,9 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="teams-tab" data-bs-toggle="tab" data-bs-target="#tabTeams" type="button" role="tab" aria-controls="teams" aria-selected="false">Teams</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#tabReviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
                 </li>
             </ul>
             <div class="tab-content mt-3" id="courseDetailsTabsContent">
@@ -191,6 +194,36 @@
 
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <!-- Reviews Tab -->
+            <div class="tab-pane fade table-container" id="tabReviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Reviews</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tblReviews">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sender</th>
+                                <th>Team</th>
+                                <th>Score</th>
+                                <th>Public Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ReviewsTableBody">
+                            <!-- Dynamically filled rows -->
+                            <tr>
+                                <td>1</td>
+                                <td>Jane Smith</td>
+                                <td>Team Alpha</td>
+                                <td>7</td>
+                                <td>Great work! You have a great attitude.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
             <!-- Back Button -->
@@ -296,6 +329,17 @@
                 columnDefs: [
                     { width: '5%', targets: 3  },
                     { width: '15%', targets: 3 }
+                ]
+            });
+            $('#tblReviews').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: true,
+                columnDefs: [
+                    { width: '5%', targets: 4 },
+                    { width: '15%', targets: 4 }
                 ]
             });
         });

@@ -18,14 +18,6 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" id="navCourses" href="#">Courses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="navReviews" href="#">Reviews</a>
-                    </li>
-                </ul>
                 <!-- Dropdown button for account -->
                 <div class="dropdown">
                     <button class="btn btn-lg btn-light dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,7 +45,7 @@
     </div>
 
     <!-- Main content area -->
-    <div class="container mb-4" id="divCourseCards">
+    <div class="container-fluid mb-4" id="divCourseCards">
         <div class="bg-light p-4 shadow-lg">
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 
@@ -107,6 +99,9 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="teams-tab" data-bs-toggle="tab" data-bs-target="#tabTeams" type="button" role="tab" aria-controls="teams" aria-selected="false">Teams</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#tabReviews" type="button" role="tab" aria-controls="Reviews" aria-selected="false">Reviews</button>
                 </li>
             </ul>
             <div class="tab-content mt-3" id="courseDetailsTabsContent">
@@ -245,6 +240,61 @@
                         </table>
     
                     </div>
+                </div>
+            </div>
+            <!-- Reviews Tab -->
+            <div class="tab-pane fade table-container" id="tabReviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Reviews</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tblReviews">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Sender</th>
+                                <th>Receiver</th>
+                                <th>Team</th>
+                                <th>Score</th>
+                                <th>Public Feedback</th>
+                                <th>Private Feedback</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ReviewsTableBody">
+                            <!-- Dynamically filled rows -->
+                            <tr>
+                                <td>1</td>
+                                <td>John Doe</td>
+                                <td>Jane Smith</td>
+                                <td>Team Alpha</td>
+                                <td>7</td>
+                                <td>Great work! You have a great attitude.</td>
+                                <td>Jane was very enthusiastic and hard working but she was often late to meetings.</td>
+                                <td>Pending</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2">Reject</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Jane Smith</td>
+                                <td>John Doe</td>
+                                <td>Team Alpha</td>
+                                <td>9</td>
+                                <td>Awesome Job! You are killing it</td>
+                                <td>John was the best team mate ever!</td>
+                                <td>Accepted</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                    <button class="btn btn-sm btn-outline-dark ms-2">Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
             <!-- Back Button -->
@@ -575,6 +625,13 @@
                 info: true,
                 lengthChange: true,
             });
+            $('#tblReviews').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: true,
+            });
         });
         
 
@@ -802,9 +859,6 @@
             });
         });
 
-        document.querySelector('navCourses').addEventListener('click', () => {
-
-        }
     </script>
 </body>
 </html>
