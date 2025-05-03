@@ -15,72 +15,142 @@ app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
 
-app.post('/user', (req, res, next) => {
-    let strEmail = req.body.email.trim().toLowerCase();
-    let strPassword = req.body.password;
-    let strFirstName = req.body.firstName;
-    let strLastName = req.body.lastName;
-    let strTitle = req.body.title;
-    let strLastLogin = req.body.lastLogin;
+// Start the server
+app.listen(HTTP_PORT, () => {
+    console.log(`Server running on http://localhost:${HTTP_PORT}`);
+});
 
-    // Email validation using regex
+
+    app.post('/user', (req, res, next) => {
+    // --- 1. Read required inputs from request body ---
+    const strEmail = req.body.email ? req.body.email.trim().toLowerCase() : null;
+    const strPassword = req.body.password;
+    const strFirstName = req.body.firstName;
+    const strLastName = req.body.lastName;
+    const strTitle = req.body.title;
+    // We DO NOT read lastLogin from req.body for registration
+
+    // --- 2. Server-side Validations ---
+    if (!strEmail) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(strEmail)) {   
-        return res.status(400).json({ error: "You must provide a valid email address" });
+    if (!emailRegex.test(strEmail)) {
+        return res
+        .status(400)
+        .json({ error: 'You must provide a valid email address' });
     }
 
-    // Password validation based on NIST standards
+    if (!strPassword) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
+    // Password complexity checks
     if (strPassword.length < 8) {
-        return res.status(400).json({ error: "Password must be at least 8 characters long" });
+        return res
+        .status(400)
+        .json({ error: 'Password must be at least 8 characters long' });
     }
     if (!/[A-Z]/.test(strPassword)) {
-        return res.status(400).json({ error: "Password must contain at least one uppercase letter" });
+        return res
+        .status(400)
+        .json({ error: 'Password must contain at least one uppercase letter' });
     }
     if (!/[a-z]/.test(strPassword)) {
-        return res.status(400).json({ error: "Password must contain at least one lowercase letter" });
+        return res
+        .status(400)
+        .json({ error: 'Password must contain at least one lowercase letter' });
     }
     if (!/[0-9]/.test(strPassword)) {
-        return res.status(400).json({ error: "Password must contain at least one number" });
+        return res
+        .status(400)
+        .json({ error: 'Password must contain at least one number' });
     }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(strPassword)) {
-        return res.status(400).json({ error: "Password must contain at least one special character" });
+        return res
+        .status(400)
+        .json({ error: 'Password must contain at least one special character' });
     }
 
-    strPassword = bcrypt.hashSync(strPassword, intSalt);
-
-    if (strFirstName.length > 1 || strLastName.length > 1) {
-        return res.status(400).json({ error: "You must provide a valid first and last name" });
+    if (!strFirstName || strFirstName.length < 1) {
+        return res.status(400).json({ error: 'First name is required' });
     }
+    if (!strLastName || strLastName.length < 1) {
+        return res.status(400).json({ error: 'Last name is required' });
+    }
+    if (!strTitle) {
+        return res.status(400).json({ error: 'User title is required' });
+    }
+    // --- End Validations ---
 
-    // Check if the email already exists in the database
-    let strCommand = 'SELECT * FROM tblUsers WHERE Email = ?';
-    db.all(strCommand, [strEmail], (err, result) => {
+    // --- 3. Hash Password (only after validation passes) ---
+    const hashedPassword = bcrypt.hashSync(strPassword, intSalt);
+
+    // --- 4. Check if Email Exists (Fixing Race Condition) ---
+    const checkEmailCommand = 'SELECT Email FROM tblUsers WHERE Email = ?';
+    db.get(checkEmailCommand, [strEmail], (err, row) => {
+        // Use db.get which is better for checking unique existence
         if (err) {
-            console.log(err);
-            res.status(400).json({ status:"error", message: err.message });
+        console.error('Database error checking email:', err.message);
+        // Don't expose detailed DB errors to client in production
+        return res
+            .status(500)
+            .json({ status: 'error', message: 'Error checking user data.' });
+        }
+
+        if (row) {
+        // Email already exists
+        return res.status(400).json({ error: 'Email already exists' });
         } else {
-            if (result.length > 0) {
-                return res.status(400).json({ error: "Email already exists" });
+        // --- 5. Email does NOT exist - Proceed with INSERT ---
+
+        // Prepare the INSERT command:
+        // - List columns explicitly.
+        // - OMIT `account_created` so the DEFAULT CURRENT_TIMESTAMP is used.
+        // - Include `last_login_date`.
+        const insertCommand = `
+                    INSERT INTO tblUsers
+                    (email, firstname, lastname, title, password, last_login_date)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                `; // 6 placeholders
+
+        // Prepare the parameters for the INSERT command:
+        // - Match the order of columns listed above.
+        // - Use the hashed password.
+        // - Use NULL for last_login_date.
+        const params = [
+            strEmail,
+            strFirstName,
+            strLastName,
+            strTitle,
+            hashedPassword, // Use the hashed password
+            null, // Set last_login_date to NULL for new registration
+        ]; // 6 parameters
+
+        // Run the INSERT command
+        db.run(insertCommand, params, function (insertErr) {
+            // Use 'function' to access 'this.lastID' if needed later
+            if (insertErr) {
+            console.error('Database error inserting user:', insertErr.message);
+            return res.status(400).json({
+                status: 'error',
+                // Consider a generic message in production: "Failed to create account."
+                message: 'Failed to register user: ' + insertErr.message,
+            });
+            } else {
+            // --- 6. Success ---
+            console.log(`User ${strEmail} created successfully.`);
+            // Send success response
+            return res.status(201).json({
+                status: 'success',
+                // You could optionally return the email or user ID (this.lastID)
+                // message: `User ${strEmail} created.`
+            });
             }
+        });
         }
     });
+    });
 
-    // If validations pass
-    strCommand = `INSERT INTO tblUsers VALUES (?, ?, ?, ?, ?, ?) `;
-    db.run(strCommand, [strEmail, strFirstName, strLastName, strTitle, strPassword, strLastLogin], function (err) {
-        if(err){
-            console.log(err)
-            res.status(400).json({
-                status:"error",
-                message:err.message
-            })
-        } else {
-            res.status(201).json({
-                status:"success"
-            })
-        }
-    })
-});
 
 app.post('/sessions', (req, res, next) => {
     const strEmail = req.body.email.trim().toLowerCase();
