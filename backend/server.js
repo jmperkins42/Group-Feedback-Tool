@@ -15,11 +15,6 @@ app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
 
-// Start the server
-app.listen(HTTP_PORT, () => {
-    console.log(`Server running on http://localhost:${HTTP_PORT}`);
-});
-
 
 app.post('/user', (req, res, next) => {
     // --- 1. Read required inputs from request body ---
@@ -207,20 +202,127 @@ app.post('/sessions', (req, res, next) => {
     })
 }) 
 
-function verifySession(strSessionID){
-    return new Promise((resolve, reject) => {
-        let strCommand = 'SELECT * FROM tblSessions WHERE SessionID = ?';
-        db.all(strCommand, [strSessionID], (err, result) => {
+
+
+// SESSION N SHIT THAT NEEDS TO BE AUTHENTICATED FOR--------------------------------------------------------------------------------->
+
+// Enhanced verifySession - resolves with user email or null
+    function verifySession(sessionID) {
+        // Renamed parameter for clarity
+        return new Promise((resolve, reject) => {
+        // Select the user_id (email) associated with the session
+        // Also good practice to check session status/expiry later
+        const sql = 'SELECT user_id FROM tblSessions WHERE SessionID = ?';
+        // Use db.get as SessionID should be unique, more efficient
+        db.get(sql, [sessionID], (err, row) => {
             if (err) {
-                console.log(err);
-                reject(err);
+            console.error('Database error verifying session:', err.message);
+            // Reject with the error for centralized handling
+            reject(err);
             } else {
-                if (result.length === 0) {
-                    resolve(false);
-                } else {
-                    resolve(true);
-                }
+            if (row && row.user_id) {
+                // Session found and has a user_id, resolve with the user's email
+                resolve(row.user_id);
+            } else {
+                // Session not found or invalid, resolve with null
+                resolve(null);
+            }
             }
         });
+        });
+    }
+    
+
+        // Middleware function to check for a valid session
+    async function requireAuth(req, res, next) {
+        // 1. Get the session ID from the cookies
+        const sessionID = req.cookies.sessionID; // Requires 'cookie-parser' middleware
+    
+        // 2. Check if the session ID cookie exists
+        if (!sessionID) {
+        console.log('Auth Middleware: No sessionID cookie found.');
+        // If no cookie, definitely not authenticated
+        return res.status(401).json({ error: 'Authentication required.' });
+        }
+    
+        try {
+        // 3. Verify the session ID using our enhanced function
+        const userEmail = await verifySession(sessionID);
+    
+        // 4. Check the verification result
+        if (userEmail) {
+            // Session is valid!
+            // Attach user email to the request object for later use in route handlers
+            req.userEmail = userEmail;
+            console.log(`Auth Middleware: Access granted for user ${userEmail}`);
+            // Proceed to the next middleware or route handler
+            next();
+        } else {
+            // Session ID is invalid (not found in DB or expired later)
+            console.log(
+            `Auth Middleware: Invalid sessionID received: ${sessionID}`
+            );
+            // Clear the invalid cookie from the browser (optional but good practice)
+            res.clearCookie('sessionID');
+            return res.status(401).json({ error: 'Invalid session. Please log in again.' });
+        }
+        } catch (error) {
+        // Handle potential errors during database verification
+        console.error('Auth Middleware: Error during session verification:', error);
+        return res.status(500).json({ error: 'Internal server error during authentication.' });
+        }
+    }
+    
+    // Apply the requireAuth middleware to all routes that need authentication
+    app.use(requireAuth);
+        // --- Protected Routes (Require Authentication) ---
+
+    // // Example: Route to get courses (needs to be implemented)
+    // app.get('/courses', (req, res) => {
+    //     // Thanks to the middleware, we know the user is authenticated
+    //     // We can access the user's email via req.userEmail
+    //     const loggedInUserEmail = req.userEmail;
+    //     console.log(`Fetching courses for user: ${loggedInUserEmail}`);
+    
+    //     // TODO: Add database logic to fetch courses for loggedInUserEmail
+    //     // Example: db.all('SELECT * FROM tblCourses WHERE instructor_email = ?', [loggedInUserEmail], ...)
+    
+    //     res.json({
+    //     message: `Placeholder: Courses for ${loggedInUserEmail} would be here.`,
+    //     });
+    // });
+    
+    // // Example: Route to add a course (needs to be implemented)
+    // app.post('/courses', (req, res) => {
+    //     const loggedInUserEmail = req.userEmail;
+    //     const { courseName, courseDescription } = req.body; // Get data from request body
+    //     console.log(`User ${loggedInUserEmail} attempting to add course: ${courseName}`);
+    
+    //     // TODO: Add validation and database logic to insert the course,
+    //     // potentially linking it to the loggedInUserEmail (e.g., in tblEnrollments or an instructor_email column)
+    
+    //     res.status(201).json({ status: "success", message: `Course '${courseName}' added (placeholder).` });
+    // });
+    
+    
+    // Add other protected routes here (e.g., GET /students, POST /teams, etc.)
+    
+    
+    // --- Error Handling and Server Start (Keep these at the end) ---
+    app.use((req, res, next) => {
+        // 404 Handler for routes not matched above
+        res.status(404).json({ message: 'Resource not found' });
     });
-}
+    
+    app.use((err, req, res, next) => {
+        // General Error Handler
+        console.error(err.stack);
+        res.status(err.status || 500).json({
+        status: 'error',
+        message: err.message || 'Internal Server Error',
+        });
+    });
+    
+    app.listen(HTTP_PORT, () => {
+        console.log(`Server running on http://localhost:${HTTP_PORT}`);
+    });
