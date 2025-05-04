@@ -21,7 +21,7 @@ app.listen(HTTP_PORT, () => {
 });
 
 
-    app.post('/user', (req, res, next) => {
+app.post('/user', (req, res, next) => {
     // --- 1. Read required inputs from request body ---
     const strEmail = req.body.email ? req.body.email.trim().toLowerCase() : null;
     const strPassword = req.body.password;
@@ -44,27 +44,32 @@ app.listen(HTTP_PORT, () => {
     if (!strPassword) {
         return res.status(400).json({ error: 'Password is required' });
     }
+
     // Password complexity checks
     if (strPassword.length < 8) {
         return res
         .status(400)
         .json({ error: 'Password must be at least 8 characters long' });
     }
+
     if (!/[A-Z]/.test(strPassword)) {
         return res
         .status(400)
         .json({ error: 'Password must contain at least one uppercase letter' });
     }
+
     if (!/[a-z]/.test(strPassword)) {
         return res
         .status(400)
         .json({ error: 'Password must contain at least one lowercase letter' });
     }
+
     if (!/[0-9]/.test(strPassword)) {
         return res
         .status(400)
         .json({ error: 'Password must contain at least one number' });
     }
+
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(strPassword)) {
         return res
         .status(400)
@@ -74,9 +79,11 @@ app.listen(HTTP_PORT, () => {
     if (!strFirstName || strFirstName.length < 1) {
         return res.status(400).json({ error: 'First name is required' });
     }
+
     if (!strLastName || strLastName.length < 1) {
         return res.status(400).json({ error: 'Last name is required' });
     }
+
     if (!strTitle) {
         return res.status(400).json({ error: 'User title is required' });
     }
@@ -97,59 +104,59 @@ app.listen(HTTP_PORT, () => {
             .json({ status: 'error', message: 'Error checking user data.' });
         }
 
-        if (row) {
         // Email already exists
-        return res.status(400).json({ error: 'Email already exists' });
+        if (row) {
+            return res.status(400).json({ error: 'Email already exists' });
         } else {
-        // --- 5. Email does NOT exist - Proceed with INSERT ---
+            // --- 5. Email does NOT exist - Proceed with INSERT ---
 
-        // Prepare the INSERT command:
-        // - List columns explicitly.
-        // - OMIT `account_created` so the DEFAULT CURRENT_TIMESTAMP is used.
-        // - Include `last_login_date`.
-        const insertCommand = `
-                    INSERT INTO tblUsers
-                    (email, firstname, lastname, title, password, last_login_date)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                `; // 6 placeholders
+            // Prepare the INSERT command:
+            // - List columns explicitly.
+            // - OMIT `account_created` so the DEFAULT CURRENT_TIMESTAMP is used.
+            // - Include `last_login_date`.
+            const insertCommand = `
+                        INSERT INTO tblUsers
+                        (email, firstname, lastname, title, password, last_login_date)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    `; // 6 placeholders
 
-        // Prepare the parameters for the INSERT command:
-        // - Match the order of columns listed above.
-        // - Use the hashed password.
-        // - Use NULL for last_login_date.
-        const params = [
-            strEmail,
-            strFirstName,
-            strLastName,
-            strTitle,
-            hashedPassword, // Use the hashed password
-            null, // Set last_login_date to NULL for new registration
-        ]; // 6 parameters
+            // Prepare the parameters for the INSERT command:
+            // - Match the order of columns listed above.
+            // - Use the hashed password.
+            // - Use NULL for last_login_date.
+            const params = [
+                strEmail,
+                strFirstName,
+                strLastName,
+                strTitle,
+                hashedPassword, // Use the hashed password
+                null, // Set last_login_date to NULL for new registration
+            ]; // 6 parameters
 
-        // Run the INSERT command
-        db.run(insertCommand, params, function (insertErr) {
-            // Use 'function' to access 'this.lastID' if needed later
-            if (insertErr) {
-            console.error('Database error inserting user:', insertErr.message);
-            return res.status(400).json({
-                status: 'error',
-                // Consider a generic message in production: "Failed to create account."
-                message: 'Failed to register user: ' + insertErr.message,
+            // Run the INSERT command
+            db.run(insertCommand, params, function (insertErr) {
+                // Use 'function' to access 'this.lastID' if needed later
+                if (insertErr) {
+                console.error('Database error inserting user:', insertErr.message);
+                return res.status(400).json({
+                    status: 'error',
+                    // Consider a generic message in production: "Failed to create account."
+                    message: 'Failed to register user: ' + insertErr.message,
+                });
+                } else {
+                    // --- 6. Success ---
+                    console.log(`User ${strEmail} created successfully.`);
+                    // Send success response
+                    return res.status(201).json({
+                        status: 'success',
+                        // You could optionally return the email or user ID (this.lastID)
+                        // message: `User ${strEmail} created.`
+                    });
+                }
             });
-            } else {
-            // --- 6. Success ---
-            console.log(`User ${strEmail} created successfully.`);
-            // Send success response
-            return res.status(201).json({
-                status: 'success',
-                // You could optionally return the email or user ID (this.lastID)
-                // message: `User ${strEmail} created.`
-            });
-            }
-        });
         }
     });
-    });
+});
 
 
 app.post('/sessions', (req, res, next) => {

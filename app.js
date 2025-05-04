@@ -315,7 +315,70 @@ document.querySelector('#btnLogin').addEventListener('click', function(){
 // click event for btnInstructorRegister
 document.querySelector('#btnInstructorRegister').addEventListener('click', function(){
     // Define a function to create a user
-   
+    async function createUser(userData) {
+        try {
+            const objResponse = await fetch(strBaseURL + 'user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData),
+            });
+
+            // Get response body regardless of ok status to check for error messages
+            const objData = await objResponse.json();
+
+            if (!objResponse.ok) {
+                // Use error message from backend if available
+                throw new Error(objData.error || `HTTP Error Status: ${objResponse.status}`);
+            }
+
+            // Check for success status from backend
+            if (objData.status === 'success') {
+                // Sweetalert for success *after* backend confirmation
+                await Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Registration Successful!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+
+                // Clear *all* relevant form fields
+                document.querySelector('#txtInstructorUsernameRegister').value = '';
+                document.querySelector('#txtInstructorPasswordRegister').value = '';
+                document.querySelector('#txtInstructorRetypePassword').value = '';
+                document.querySelector('#txtInstructorFirstName').value = '';
+                document.querySelector('#txtInstructorMiddleName').value = '';
+                document.querySelector('#txtInstructorLastName').value = '';
+                document.querySelector('#txtInstructorPhoneNumber').value = '';
+                document.querySelector('#txtInstructorDiscordName').value = '';
+                document.querySelector('#txtInstructorTeamsEmail').value = '';
+                document.querySelector('#cboInstructorOrgType').value = '';
+                document.querySelector('#txtInstructorOrgName').value = '';
+
+                // Swap views
+                document.querySelector('#frmInstructorRegister').style.display = 'none';
+                document.querySelector('#frmLogin').style.display = 'block';
+            } else {
+                // Handle application-specific errors returned from backend
+                Swal.fire({
+                    title: 'Registration Failed',
+                    html: objData.error || 'An unknown error occurred.',
+                    icon: 'error',
+                });
+            }
+        } catch (objError) {
+            console.error('Error during registration fetch:', objError);
+            
+            // Create sweetalert for network/parsing errors
+            Swal.fire({
+            title: 'Registration Error',
+            html:
+                objError.message ||
+                'Could not complete registration. Please try again later.',
+            icon: 'error',
+            });
+        }  
+    }
 
     // Retrieve the values from your registration form
     const strEmail = document.querySelector('#txtInstructorUsernameRegister').value.trim().toLowerCase()
@@ -382,11 +445,16 @@ document.querySelector('#btnInstructorRegister').addEventListener('click', funct
             icon:'error'
         })
     } else {
-        Swal.fire({
-            title:'Account Created!',
-            icon:'success'
-        })
+        // Prepare user data object based on what backend expects
+        const userData = {
+            email: strEmail,
+            password: strPassword,
+            firstName: strFirstName,
+            lastName: strLastName,
+            title: 'Instructor'
+        };
+
         // Call our function to create the account
-        //createUser(strEmail,strPassword,strFirstName,strLastName)
+        createUser(userData)
     }
 })
