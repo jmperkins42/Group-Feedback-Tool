@@ -158,15 +158,14 @@ app.post('/user', (req, res, next) => {
     });
 });
 
-
 app.post('/sessions', (req, res, next) => {
     const strEmail = req.body.email.trim().toLowerCase();
     const strPassword = req.body.password;
 
-    if (strEmail, strPassword == null) {
+    if (!strEmail || !strPassword) {
         return res.status(400).json({ error: "You must provide an email and password" });
     }
-    let strCommand = 'SELECT Password FROM tblUsers WHERE Email = ?';
+    let strCommand = 'SELECT password, title FROM tblUsers WHERE email = ?';
     db.all(strCommand, [strEmail], (err, result) => {
         if (err) {
             console.log(err);
@@ -176,14 +175,15 @@ app.post('/sessions', (req, res, next) => {
                 return res.status(401).json({ error: "Invalid email or password" });
             }
 
-            let strHash = result[0].Password;
+            let strTitle = result[0].title;
+            let strHash = result[0].password;
             if (bcrypt.compareSync(strPassword, strHash)) {
                 // ON success that the passwords match, create a new sessionid using uuid, and inthen insert into tbl sessions
                 let strSessionID = uuidv4();
-                let strCommand = `INSERT INTO tblSessions VALUES (?, ?, ?) `;
+                let strCommand = `INSERT INTO tblSessions VALUES (?, ?, ?, ?, ?) `;
                 let datNow = new Date();
                 let strNow = datNow.toISOString()
-                db.run(strCommand, [strSessionID, strEmail, strNow], function (err,result) {
+                db.run(strCommand, [strSessionID, strEmail, strNow, null, 'Active'], function (err,result) {
                     if (err) {
                         console.log(err);
                         res.status(400).json({
@@ -197,9 +197,7 @@ app.post('/sessions', (req, res, next) => {
                             sameSite: 'Strict', // Prevents CSRF attacks by ensuring the cookie is sent only to the same site
                             maxAge: 12 * 60 * 60 * 1000 // Cookie expiration time (12 hours)
                         })
-                        res.status(201).json({ 
-                            status:"success"
-                        });
+                        res.status(201).json({ status:"success", SessionID: strSessionID, title: strTitle });
                     }
                 });
             } else {

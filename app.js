@@ -71,52 +71,58 @@ document.querySelector('#btnInstructorSwapLoginBottom').addEventListener('click'
 
 
 // click event for btnLogin
-document.querySelector('#btnLogin').addEventListener('click', function(){
-    // async function createSession(strUserEmail,strUserPassword){
-    //     try{
-    //         const objResponse = await fetch(strBaseURL + 'sessions.php',{
-    //             method:'POST',
-    //             headers: {
-    //                 'Content-Type':'application/json'
-    //             },
-    //             //makes json object a string
-    //             body: JSON.stringify({Email:strUserEmail,Password:strUserPassword}) 
-    //         })
+document.querySelector('#btnLogin').addEventListener('click', function(e){
+    e.preventDefault();
+    
+    async function createSession(strUserEmail,strUserPassword){
+        try{
+            const objResponse = await fetch(strBaseURL + 'sessions',{
+                method:'POST',
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                //makes json object a string
+                body: JSON.stringify({ email:strUserEmail, password:strUserPassword }) 
+            })
 
-    //         if (!objResponse.ok){
-    //             throw new Error('HTTP Error Status', objResponse.status)
-    //         }
+            if (!objResponse.ok){
+                throw new Error(`HTTP Error Status ${objResponse.status}`)
+            }
 
-    //         const objData = await objResponse.json()
-    //         if(objData.SessionID){
-    //             //Sweetalert for success
-    //             Swal.fire({
-    //                 position: "top-end",
-    //                 icon: "success",
-    //                 title: "Login Successful",
-    //                 showConfirmButton: false,
-    //                 timer: 1500
-    //             })
-    //             // Save the SessionID to sessionStorage
-    //             sessionStorage.setItem('SessionID',objData.SessionID)
-    //             //clear our form
-    //             document.querySelector('#txtLoginUsername').value = ""
-    //             document.querySelector('#txtLoginPassword').value = ""
-    //             //swap login
-    //             document.querySelector('#frmLogin').style.display = 'none'
-    //             document.querySelector('#divDashboard').style.display = 'block'
-    //         } else{
-    //             //Sweetalert for failure
-    //         }
-    //     } catch(objError){
-    //         console.log('Error fetching objData', objError)
-    //         // create sweetalert for user indicating failure
-    //     }
-    // }
+            const objData = await objResponse.json()
+            if(objData.SessionID){
+                //Sweetalert for success
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Login Successful",
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                // Save the SessionID to sessionStorage
+                sessionStorage.setItem('SessionID',objData.SessionID)
+                //clear our form
+                document.querySelector('#txtLoginUsername').value = ""
+                document.querySelector('#txtLoginPassword').value = ""
+                //swap login
+                if (objData.title === 'Instructor') {
+                    window.location.href = 'dashboard.html'
+                } else {
+                    window.location.href = 'studentdash.html'
+                }
+            } else{
+                //Sweetalert for failure
+            }
+        } catch(objError){
+            console.log('Error fetching objData', objError)
+            // create sweetalert for user indicating failure
+        }
+    }
 
     // Retrieve the values from your login form
     const strEmail = document.querySelector('#txtUsernameLogin').value.trim().toLowerCase()
     const strPassword = document.querySelector('#txtPasswordLogin').value
+    
     // Validate the data
     let blnError = false
     let strMessage = ''
@@ -138,14 +144,9 @@ document.querySelector('#btnLogin').addEventListener('click', function(){
             icon:'error'
         })
     } else {
-        Swal.fire({
-            title:'Logging In!',
-            icon:'success'
-        })
         // Call our function to create the account
-        //createSession(strEmail,strPassword) 
+        createSession(strEmail,strPassword) 
     }
-
 
     // Evaluate the response to ensure it worked
     // Save session information to sessionStorage 
