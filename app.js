@@ -96,15 +96,17 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
                     position: "top-end",
                     icon: "success",
                     title: "Login Successful",
-                    showConfirmButton: false,
+                    showConfirmButton: true,
                     timer: 1500
-                })
+                }) 
+                console.log('objData', objData)
                 // Save the SessionID to sessionStorage
                 sessionStorage.setItem('SessionID',objData.SessionID)
                 //clear our form
-                document.querySelector('#txtLoginUsername').value = ""
-                document.querySelector('#txtLoginPassword').value = ""
+                document.querySelector('#txtUsernameLogin').value = ""
+                document.querySelector('#txtPasswordLogin').value = ""
                 //swap login
+                
                 if (objData.title === 'Instructor') {
                     window.location.href = 'dashboard.html'
                 } else {
@@ -112,6 +114,11 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
                 }
             } else{
                 //Sweetalert for failure
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: objData.error || "Invalid credentials.", // Use error from server if available
+                    });
             }
         } catch(objError){
             console.log('Error fetching objData', objError)
@@ -144,7 +151,7 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
             icon:'error'
         })
     } else {
-        // Call our function to create the account
+        // Call our function to create the session
         createSession(strEmail,strPassword) 
     }
 
@@ -302,10 +309,6 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
             firstName: strFirstName,
             lastName: strLastName,
             title: 'Student', // Or determine dynamically
-            // Include other fields ONLY if backend /user endpoint handles them
-            // phoneNumber: strPhoneNumber,
-            // orgType: strOrgType,
-            // orgName: strOrgName,
         };
 
         // Call our function to create the account
@@ -314,7 +317,7 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
     });
 
 // click event for btnInstructorRegister
-document.querySelector('#btnInstructorRegister').addEventListener('click', function(){
+    document.querySelector('#btnInstructorRegister').addEventListener('click', function(){
     // Define a function to create a user
     async function createUser(userData) {
         try {
