@@ -287,7 +287,7 @@ function verifySession(sessionID) {
     app.use(requireAuth);
         // --- Protected Routes (Require Authentication) ---
 
-    // Route to get courses (might not be finished)
+    // Route to get courses
     app.get('/courses', (req, res) => {
         const strEmail = req.userEmail;
         const sql = 'SELECT * FROM tblCourses INNER JOIN tblEnrollments WHERE tblCourses.id == tblEnrollments.course_id AND tblEnrollments.user_email = ?';
@@ -338,9 +338,9 @@ function verifySession(sessionID) {
     });
     
     // Route to get students (might not be finished)
-    app.get('/students', (req, res) => {
+    app.get('/students', (req, res, next) => {
         const strCourseID = req.query.courseID; // Get course ID from query parameters
-        const sql = 'SELECT * FROM tblEnrollments WHERE course_id = ?';
+        const sql = 'SELECT tblEnrollments.user_email, tblUsers.firstname, tblUsers.lastname FROM tblEnrollments JOIN tblUsers ON tblEnrollments.user_email = tblUsers.email WHERE tblEnrollments.course_id = ?';
     
         // fetch students for loggedInUserEmail
         db.all(sql, [strCourseID], (err, result) => {
@@ -352,27 +352,39 @@ function verifySession(sessionID) {
                 return res.status(400).json({ error: 'No students found for this course' })
             }
             // If students are found, send them back to the client
-            res.status(201).json({
-                students: result
-            })
+            res.status(201).json({ students: result })
         })
     });
 
-    // Route to add a student (might not be finished)
-    app.post('/students', (req, res) => {
-        const strCourseID = req.body.courseID;
-        const strEmail = req.body.email;
-        const strEnrollmentID = uuidv4();
+// Route to add a student (might not be finished)
+app.post('/students', (req, res) => {
+    const strCourseID = req.body.courseID;
+    const strEmail = req.body.email;
+    const strEnrollmentID = uuidv4();
+
+    const strSelectStudent = 'SELECT email FROM tblUsers WHERE email = ?';
+    db.get(strSelectStudent, [strEmail], (err, row) => {
+        if (err) {
+            console.error('Database error checking user existence:', err.message);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (!row) {
+            return res.status(400).json({ error: `User '${strEmail}' does not exist. Please have them register first.` });
+        }
+        
         const strInsertStudent = `INSERT INTO tblEnrollments (id, course_id, user_email, role) VALUES (?, ?, ?, ?)`;
         db.run(strInsertStudent, [strEnrollmentID, strCourseID, strEmail, 'Student'], function (err) {
             if (err) {
                 console.error('Database error inserting student:', err.message);
                 return res.status(500).json({ error: 'Internal server error' });
             }
+
             // If the student is added successfully, send a success response
             res.status(201).json({ status: 'success', message: `Student '${strEmail}' added to course '${strCourseID}'.` });
         })
-    });
+    })
+});
 
     // Route to get course groups (might not be finished)
     app.get('/groups', (req, res) => {

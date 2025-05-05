@@ -99,70 +99,12 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Grade</th>
-                                    <th>Actions</th>
-                                    <th>Reviews</th>
                                 </tr>
                             </thead>
                             <tbody id="studentsTableBody">
-                                <!-- Dynamically filled rows -->
-                                <tr>
-                                    <td>1</td>
-                                    <td>John Doe</td>
-                                    <td>johndoe@example.com</td>
-                                    <td>90%</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
-                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-eye"></i> View Reviews</button>
-                                    </td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Jane Smith</td>
-                                    <td>janesmith@example.com</td>
-                                    <td>85%</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
-                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Emily Johnson</td>
-                                    <td>emilyjohnson@example.com</td>
-                                    <td>88%</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="studentActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="studentActionsDropdown">
-                                            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editStudentGradeModal"><i class="bi bi-pencil"></i> Edit</button></li>
-                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
-                                    </td>
-                                </tr>
+                                
                             </tbody>
                         </table>
-    
                     </div>
                 </div>
                 <!-- Teams Tab -->
@@ -390,7 +332,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="btnAddNewCourse">Add Student to Course</button>
+                    <button type="button" class="btn btn-success" id="btnAddNewStudent">Add Student to Course</button>
                 </div>
             </div>
         </div>
@@ -576,6 +518,33 @@
     <script>
 
         const strBaseURL = 'http://127.0.0.1:8000/';
+        let strCurrentCourseID = '';
+
+        function loadStudents(courseID) {
+            fetch(strBaseURL + `students?courseID=${courseID}`, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('studentsTableBody');
+                tbody.innerHTML = ''; // Clear existing rows
+                data.students.forEach((student, index) => {
+                    const strFullName = `${student.firstname} ${student.lastname}`;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${strFullName || 'N/A'}</td>
+                        <td>${student.user_email}</td>
+                        <td>${student.grade || '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error('Error loading students:', err);
+            });
+        }
 
         // Initialize DataTables for Students and Teams tables
         $(document).ready(function() {
@@ -627,6 +596,27 @@
                         </div>
                     `;
                     container.appendChild(card);
+
+                    // Handle "View Details" button click
+                    document.querySelectorAll('.btn-view-course-details').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const courseID = button.getAttribute('data-id');
+                            strCurrentCourseID = courseID;
+
+                            const courseCard = button.closest('.card');
+                            const courseName = courseCard.querySelector('.card-title').textContent;
+                            const courseDescription = courseCard.querySelector('.card-text').textContent;
+
+                            // Populate course details
+                            document.getElementById('courseName').textContent = courseName;
+                            document.getElementById('courseDescription').textContent = courseDescription;
+                            loadStudents(courseID);
+
+                            // Hide dashboard and show course details view
+                            document.getElementById('divCourseCards').classList.add('d-none');
+                            document.getElementById('courseDetailsView').classList.remove('d-none');
+                        });
+                    });
                 });
             })
             .catch(err => {
@@ -715,24 +705,6 @@
             });
         });
 
-
-        // Handle "View Details" button click
-        document.querySelectorAll('.btn-view-course-details').forEach(button => {
-            button.addEventListener('click', () => {
-                const courseCard = button.closest('.card');
-                const courseName = courseCard.querySelector('.card-title').textContent;
-                const courseDescription = courseCard.querySelector('.card-text').textContent;
-
-                // Populate course details
-                document.getElementById('courseName').textContent = courseName;
-                document.getElementById('courseDescription').textContent = courseDescription;
-
-                // Hide dashboard and show course details view
-                document.getElementById('divCourseCards').classList.add('d-none');
-                document.getElementById('courseDetailsView').classList.remove('d-none');
-            });
-        });
-
         // Back to Dashboard button
         document.getElementById('backToDashboard').addEventListener('click', () => {
             document.getElementById('courseDetailsView').classList.add('d-none');
@@ -746,7 +718,6 @@
 
             // Validate form inputs
             if (strCourseName && strCourseDescription) {
-                // SEND DATA TO SERVER
                 fetch(strBaseURL + 'courses', {
                     method: 'POST',
                     credentials: 'include',
@@ -776,6 +747,46 @@
                 });
             }
         });
+
+        document.querySelector('#btnAddNewStudent').addEventListener('click', () => {
+            const strEmail = document.querySelector('#txtAddStudentEmail').value;
+            fetch(strBaseURL + 'students', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseID: strCurrentCourseID,
+                    email: strEmail
+                })
+            }).then(res => {
+                if (res.status === 201) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Student Added',
+                        text: `Student ${strEmail} has been enrolled!`
+                    });
+
+                    document.getElementById('addStudentModal').querySelector('form').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
+                    loadStudents(strCurrentCourseID);
+                } else {
+                    return res.json().then(data => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to Add Student',
+                            text: data.error || 'Something went wrong.'
+                        });
+                    });
+                }
+            }).catch(err => {
+                console.error('Error adding student:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: 'Could not reach server.'
+                });
+            });
+        })
 
         // Add Team Member Button Click
         document.getElementById('btnAddTeamMember').addEventListener('click', () => {
