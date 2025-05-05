@@ -493,71 +493,158 @@ function verifySession(sessionID) {
         });
     });
 
-        //UNDER CONSTRUCTION--------------------------------------------------------------------------------->
-        app.post("/createReview", async (req, res) => {
-            const {
-            title,
-            questions
-            } = req.body;
-        
-            if (!title || !questions || !Array.isArray(questions)) {
-            return res.status(400).json({
-                error: "Invalid request body"
-            });
-            }
-        
-            const client = await pool.connect();
-            try {
-            await client.query("BEGIN");
-        
-            // Insert the review into the tblAssessments table
-            const insertAssessmentQuery = `
-                INSERT INTO "tblAssessments" (name, start_date, end_date, status, type)
-                VALUES ($1, $2, $3, $4, $5)
-                RETURNING id;
-            `;
-            // You'll need to determine appropriate start_date, end_date, status, and type values
-            // For now, I'm using placeholders.
-            const assessmentResult = await client.query(insertAssessmentQuery, [
-                title,
-                null, // Replace with actual start_date
-                null, // Replace with actual end_date
-                "Active", // Replace with actual status
-                "Review", // Replace with actual type
-            ]);
-            const assessmentId = assessmentResult.rows[0].id;
-        
-            // Insert the questions into a separate table (e.g., tblReviewQuestions)
-            // You'll need a table to store review questions, linked to tblAssessments
-            const insertQuestionQuery = `
-                INSERT INTO "tblReviewQuestions" (assessment_id, question_type, question_text)
-                VALUES ($1, $2, $3);
-            `;
-            for (const question of questions) {
-                await client.query(insertQuestionQuery, [
-                assessmentId,
-                question.type,
-                question.question,
-                ]);
-            }
-        
-            await client.query("COMMIT");
-            res
-                .status(201)
-                .json({
-                message: "Review created successfully",
-                assessmentId
-                });
-            } catch (error) {
-            await client.query("ROLLBACK");
-            console.error("Error creating review:", error);
-            res.status(500).json({
-                error: "Internal server error"
-            });
-            } finally {
-            client.release();
+// Endpoint to Create an Assessment (Review)
+app.post('/assessments', async (req, res) => {
+    // Data from frontend (validated client-side, but re-validate here)
+    const { course_id, title, questions, status, type } = req.body;
+    const userEmail = req.userEmail; // From requireAuth middleware
+
+    // --- Server-side Validation ---
+    if (!course_id || !title || !questions || !Array.isArray(questions) || questions.length === 0) {
+        return res.status(400).json({ status: 'error', message: 'Missing required fields: course_id, title, and at least one question are required.' });
+    }
+    if (!title.trim()) {
+        return res.status(400).json({ status: 'error', message: 'Review title cannot be empty.' });
+    }
+    for (const q of questions) {
+        if (!q.type || !q.text || !q.text.trim()) {
+            return res.status(400).json({ status: 'error', message: 'Each question must have a type and non-empty text.' });
+        }
+        // Add validation for options if implementing MC/Likert later
+    }
+    // Basic validation for status and type (optional, depends on requirements)
+    const validStatus = ['Draft', 'Active', 'Closed']; // Example valid statuses
+    const validTypes = ['Individual', 'Team', 'Self']; // Example valid types
+    const assessmentStatus = status && validStatus.includes(status) ? status : 'Active'; // Default to Active
+    const assessmentType = type && validTypes.includes(type) ? type : 'Individual'; // Default to Individual
+
+    // --- Database Interaction ---
+    // Use db.serialize to ensure sequential execution for the transaction
+    db.serialize(() => {
+        db.run('BEGIN TRANSACTION;', (err) => {
+            if (err) {
+                console.error('Begin Transaction Error:', err.message);
+                return res.status(500).json({ status: 'error', message: 'Database error starting transaction.' });
             }
         });
+
+        // 1. Insert into tblAssessments
+        // Note: Using AUTOINCREMENT means we don't provide the ID.
+        // Note: Assuming start_date/end_date are nullable or handled elsewhere
+        const assessmentSql = `
+            INSERT INTO tblAssessments (course_id, name, status, type, start_date, end_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        // Use current date as placeholder for start/end dates if needed, or NULL
+        const startDate = null; // Or new Date().toISOString().split('T')[0];
+        const endDate = null;
+
+        // Use function() to access this.lastID
+        db.run(assessmentSql, [course_id, title.trim(), assessmentStatus, assessmentType, startDate, endDate], function(assessmentErr) {
+            if (assessmentErr) {
+                console.error('Insert Assessment Error:', assessmentErr.message);
+                db.run('ROLLBACK;'); // Rollback on error
+                return res.status(500).json({ status: 'error', message: 'Failed to create assessment record.' });
+            }
+
+            const assessmentId = this.lastID; // Get the ID of the inserted assessment
+
+            // 2. Insert into tblAssessmentQuestions
+            const questionSql = `
+                INSERT INTO tblAssessmentQuestions (assessment_id, question_narrative, question_type, helper_text, options)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            let questionInsertError = null;
+            let questionsInserted = 0;
+
+            // Prepare statement for efficiency if inserting many questions (optional but good practice)
+            const stmt = db.prepare(questionSql, (prepErr) => {
+                if (prepErr) {
+                    questionInsertError = prepErr;
+                }
+            });
+
+            if (questionInsertError) {
+                console.error('Prepare Question Statement Error:', questionInsertError.message);
+                db.run('ROLLBACK;');
+                return res.status(500).json({ status: 'error', message: 'Database error preparing questions.' });
+            }
+
+            // Loop and run the prepared statement
+            for (const question of questions) {
+                // For now, helper_text and options are null. Adjust if needed.
+                // If options are sent, stringify them: JSON.stringify(question.options)
+                stmt.run([assessmentId, question.text.trim(), question.type, null, null], function(questionErr) {
+                    if (questionErr) {
+                        questionInsertError = questionErr; // Capture the first error
+                        // Stop processing further questions on error
+                        return;
+                    }
+                    questionsInserted++;
+                });
+                if (questionInsertError) break; // Exit loop if an error occurred
+            }
+
+            // Finalize the statement after the loop
+            stmt.finalize((finalizeErr) => {
+                if (finalizeErr) {
+                    // Log this error, but the main error handling is below
+                    console.error('Finalize Question Statement Error:', finalizeErr.message);
+                     if (!questionInsertError) questionInsertError = finalizeErr; // Capture if no other error happened
+                }
+
+                // 3. Commit or Rollback based on question insertion results
+                if (questionInsertError) {
+                    console.error('Insert Question Error:', questionInsertError.message);
+                    db.run('ROLLBACK;');
+                    return res.status(500).json({ status: 'error', message: 'Failed to insert one or more questions.' });
+                } else {
+                    db.run('COMMIT;', (commitErr) => {
+                        if (commitErr) {
+                            console.error('Commit Transaction Error:', commitErr.message);
+                            // Attempt rollback just in case commit failed mid-way (though unlikely)
+                            db.run('ROLLBACK;');
+                            return res.status(500).json({ status: 'error', message: 'Database error committing transaction.' });
+                        } else {
+                            // --- Success ---
+                            console.log(`Assessment ${assessmentId} created successfully for course ${course_id} by ${userEmail}`);
+                            return res.status(201).json({
+                                status: 'success',
+                                message: 'Assessment created successfully.',
+                                assessmentId: assessmentId
+                            });
+                        }
+                    });
+                }
+            }); // End stmt.finalize
+        }); // End db.run for assessment insert
+    }); // End db.serialize
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // logout route
 app.post('/logout', async (req, res) => {
@@ -581,7 +668,7 @@ app.post('/logout', async (req, res) => {
     });
 });
 
-// UNDER CONSTRUCTION--------------------------------------------------------------------------------->
+
 
 
     app.listen(HTTP_PORT, () => {
