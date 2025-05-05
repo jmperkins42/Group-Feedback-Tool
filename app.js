@@ -462,3 +462,49 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
         createUser(userData)
     }
 })
+
+
+// app.js
+
+    document.getElementById("BtnCreateReview").addEventListener("click", async () => {
+        // Get the review title and questions from the form
+        const reviewTitle = document.getElementById("reviewTitle").value; // Assuming an input with id "reviewTitle"
+        const questions = [];
+        // You'll need to loop through your question input fields to collect them
+        // For example, if you have a container for questions and inputs within it:
+        const questionContainer = document.getElementById("IDK THE ID"); // Assuming a container with id "questionContainer"
+        const questionInputs = questionContainer.querySelectorAll("");// Assuming inputs with name "question"
+    
+        questionInputs.forEach((input) => {
+        questions.push({
+            type: "Short Answer", // Or get the actual type from your form
+            question: input.value,
+        });
+        });
+    
+        try {
+        const response = await fetch("/createReview", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+            title: reviewTitle,
+            questions: questions,
+            }),
+        });
+    
+        if (response.ok) {
+            const result = await response.json();
+            console.log("Review created successfully:", result);
+            // Handle successful creation, e.g., close the modal, update UI
+        } else {
+            console.error("Error creating review:", response.statusText);
+            // Handle errors
+        }
+        } catch (error) {
+        console.error("Error connecting to server:", error);
+        // Handle network errors
+        }
+    });
+  
