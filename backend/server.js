@@ -280,11 +280,12 @@ function verifySession(sessionID) {
     // Route to get courses (might not be finished)
     app.get('/courses', (req, res) => {
         // Thanks to the middleware, we know the user is authenticated
-        // We can access the user's email via req.userEmail
-        const strEmail = req.email;
-        const sql = 'SELECT * FROM tblCourses WHERE instructor_email = ?';
+        // We can access the user's email via req.email
+        const strEmail = req.userEmail;
+        // we have to use tblEnrollments to get the courses
+        const sql = 'SELECT * FROM tblCourses INNER JOIN tblEnrollments WHERE tblCourses.course_id == tblEnrollments.course_id AND tblEnrollments.user_email = ?';
     
-        // fetch courses for loggedInUserEmail
+        // fetch courses for user
         db.all(sql, [strEmail], (err, result) => {
             if (err) {
                 console.error('Database error fetching courses:', err.message);
@@ -302,7 +303,7 @@ function verifySession(sessionID) {
     
     // Route to add a course (might not be finished)
     app.post('/courses', (req, res) => {
-        const strEmail = req.userEmail; // Get the user's email from the request object
+        const strEmail = req.userEmail; 
         const strCourseName = req.body.coursename; // Get data from request body
         const strCourseNumber = req.body.course_number; // Get data from request body
         let strSectionNumber = null; // Initialize section number
