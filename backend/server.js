@@ -302,14 +302,29 @@ function verifySession(sessionID) {
     
     // Route to add a course (might not be finished)
     app.post('/courses', (req, res) => {
-        const strEmail = req.userEmail;
-        const { strCourseName, strCourseDescription } = req.body; // Get data from request body
+        const strEmail = req.userEmail; // Get the user's email from the request object
+        const strCourseName = req.body.coursename; // Get data from request body
+        const strCourseNumber = req.body.course_number; // Get data from request body
+        let strSectionNumber = null; // Initialize section number
+        // get a count of courses with that course_number to determine the section number
+        const sqlCount = 'SELECT COUNT(*) as count FROM tblCourses WHERE course_number = ?';
+        db.get(sqlCount, [strCourseNumber], (err, row) => {
+            if (err) {
+                console.error('Database error counting courses:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If no courses found, set section number to 1
+            let sectionNumber = row.count > 0 ? row.count + 1 : 1;
+            // Now we can insert the course
+            strSectionNumber = sectionNumber;
+        })
         // need to fix the db to include everything here
-        const sql = `INSERT INTO tblCourses 
-                (course_name, course_description, course_number, section_number, term_code, course_description, instructor_email) 
+        const sqlCourses = `INSERT INTO tblCourses 
+                (coursename, course_number, section_number, term_code, start_date, end_date, number_of_groups) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 `;
-        db.run(sql, [strCourseName, strCourseDescription, null, null, null, null, strEmail], function (err) {
+        
+        db.run(sqlCourses, [strCourseName, strCourseNumber, strSectionNumber, null, null, null], function (err) {
             if (err) {
                 console.error('Database error inserting course:', err.message);
                 return res.status(500).json({ error: 'Internal server error' });
@@ -317,8 +332,20 @@ function verifySession(sessionID) {
             // If the course is added successfully, send a success response
             res.status(201).json({ status: 'success', message: `Course '${strCourseName}' added.` });
         });
-        // TODO: Add validation and database logic to insert the course,
-        // potentially linking it to the loggedInUserEmail (e.g., in tblEnrollments or an instructor_email column)
+        const sqlEnrollments = `INSERT INTO tblEnrollments
+                (course_id, user_email, role) 
+                VALUES (?, ?, ?)
+                `;
+        // Use the course ID from the last inserted row
+        const courseID = this.lastID; // Use 'this' to access the last inserted ID
+        db.run(sqlEnrollments, [courseID, strEmail, 'Instructor'], function (err) {
+            if (err) {
+                console.error('Database error inserting enrollment:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If the enrollment is added successfully, send a success response
+            res.status(201).json({ status: 'success', message: `Enrollment for course '${strCourseName}' added.` });
+        })
     });
     
     // Route to get students (might not be finished)
