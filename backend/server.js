@@ -16,7 +16,10 @@ const HTTP_PORT = 8000
 const db = new sqlite3.Database(dbSource)
 
 var app = express()
-app.use(cors())
+app.use(cors({
+    origin: 'http://127.0.0.1:5500', // Replace with your frontend origin
+    credentials: true // Allow cookies
+}));
 app.use(express.json())
 app.use(cookieParser())
 
@@ -192,11 +195,11 @@ app.post('/sessions', (req, res, next) => {
                         });
                     } else {
                         res.cookie('sessionID', strSessionID, {
-                            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-                            secure: true, // Ensures the cookie is sent over HTTPS only
-                            sameSite: 'Strict', // Prevents CSRF attacks by ensuring the cookie is sent only to the same site
-                            maxAge: 12 * 60 * 60 * 1000 // Cookie expiration time (12 hours)
-                        })
+                            httpOnly: true,
+                            secure: false, // <--- allow over HTTP for localhost testing
+                            sameSite: 'Strict',
+                            maxAge: 12 * 60 * 60 * 1000
+                        });
                         res.status(201).json({ status:"success", SessionID: strSessionID, title: strTitle });
                     }
                 });
@@ -556,17 +559,32 @@ function verifySession(sessionID) {
             client.release();
             }
         });
+
+// logout route
+app.post('/logout', async (req, res) => {
+    const sessionID = req.cookies.sessionID;
+
+    if (!sessionID) {
+        return res.status(400).json({ error: 'No session to log out from.' });
+    }
+
+    const sql = 'UPDATE tblSessions SET status = "Inactive", end_date = ? WHERE SessionID = ?';
+    const endDate = new Date().toISOString();
+
+    db.run(sql, [endDate, sessionID], function (err) {
+        if (err) {
+            console.error('Database error ending session:', err.message);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.clearCookie('sessionID');
+        res.status(200).json({ message: 'Logged out successfully.' });
+    });
+});
+
 // UNDER CONSTRUCTION--------------------------------------------------------------------------------->
 
 
-        
-        const port = 3000; // Your desired port
-        app.listen(port, () => {
-            console.log(`Server listening on port ${port}`);
-        });
-
-
-    
     app.listen(HTTP_PORT, () => {
-        console.log(`Server running on http://localhost:${HTTP_PORT}`);
+        console.log(`Server running on port ${HTTP_PORT}`);
     });
