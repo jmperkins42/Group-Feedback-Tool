@@ -478,6 +478,82 @@ function verifySession(sessionID) {
         message: err.message || 'Internal Server Error',
         });
     });
+
+        //UNDER CONSTRUCTION--------------------------------------------------------------------------------->
+        app.post("/createReview", async (req, res) => {
+            const {
+            title,
+            questions
+            } = req.body;
+        
+            if (!title || !questions || !Array.isArray(questions)) {
+            return res.status(400).json({
+                error: "Invalid request body"
+            });
+            }
+        
+            const client = await pool.connect();
+            try {
+            await client.query("BEGIN");
+        
+            // Insert the review into the tblAssessments table
+            const insertAssessmentQuery = `
+                INSERT INTO "tblAssessments" (name, start_date, end_date, status, type)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING id;
+            `;
+            // You'll need to determine appropriate start_date, end_date, status, and type values
+            // For now, I'm using placeholders.
+            const assessmentResult = await client.query(insertAssessmentQuery, [
+                title,
+                null, // Replace with actual start_date
+                null, // Replace with actual end_date
+                "Active", // Replace with actual status
+                "Review", // Replace with actual type
+            ]);
+            const assessmentId = assessmentResult.rows[0].id;
+        
+            // Insert the questions into a separate table (e.g., tblReviewQuestions)
+            // You'll need a table to store review questions, linked to tblAssessments
+            const insertQuestionQuery = `
+                INSERT INTO "tblReviewQuestions" (assessment_id, question_type, question_text)
+                VALUES ($1, $2, $3);
+            `;
+            for (const question of questions) {
+                await client.query(insertQuestionQuery, [
+                assessmentId,
+                question.type,
+                question.question,
+                ]);
+            }
+        
+            await client.query("COMMIT");
+            res
+                .status(201)
+                .json({
+                message: "Review created successfully",
+                assessmentId
+                });
+            } catch (error) {
+            await client.query("ROLLBACK");
+            console.error("Error creating review:", error);
+            res.status(500).json({
+                error: "Internal server error"
+            });
+            } finally {
+            client.release();
+            }
+        });
+// UNDER CONSTRUCTION--------------------------------------------------------------------------------->
+
+
+        
+        const port = 3000; // Your desired port
+        app.listen(port, () => {
+            console.log(`Server listening on port ${port}`);
+        });
+
+
     
     app.listen(HTTP_PORT, () => {
         console.log(`Server running on http://localhost:${HTTP_PORT}`);
