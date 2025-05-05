@@ -207,9 +207,9 @@ app.post('/sessions', (req, res, next) => {
 // SESSION N SHIT THAT NEEDS TO BE AUTHENTICATED FOR--------------------------------------------------------------------------------->
 
 // Enhanced verifySession - resolves with user email or null
-    function verifySession(sessionID) {
-        // Renamed parameter for clarity
-        return new Promise((resolve, reject) => {
+function verifySession(sessionID) {
+    // Renamed parameter for clarity
+    return new Promise((resolve, reject) => {
         // Select the user_id (email) associated with the session
         // Also good practice to check session status/expiry later
         const sql = 'SELECT user_id FROM tblSessions WHERE SessionID = ?';
@@ -220,17 +220,17 @@ app.post('/sessions', (req, res, next) => {
             // Reject with the error for centralized handling
             reject(err);
             } else {
-            if (row && row.user_id) {
-                // Session found and has a user_id, resolve with the user's email
-                resolve(row.user_id);
-            } else {
-                // Session not found or invalid, resolve with null
-                resolve(null);
-            }
+                if (row && row.user_id) {
+                    // Session found and has a user_id, resolve with the user's email
+                    resolve(row.user_id);
+                } else {
+                    // Session not found or invalid, resolve with null
+                    resolve(null);
+                }
             }
         });
-        });
-    }
+    });
+}
     
 
         // Middleware function to check for a valid session
@@ -277,36 +277,192 @@ app.post('/sessions', (req, res, next) => {
     app.use(requireAuth);
         // --- Protected Routes (Require Authentication) ---
 
-    // // Example: Route to get courses (needs to be implemented)
-    // app.get('/courses', (req, res) => {
-    //     // Thanks to the middleware, we know the user is authenticated
-    //     // We can access the user's email via req.userEmail
-    //     const loggedInUserEmail = req.userEmail;
-    //     console.log(`Fetching courses for user: ${loggedInUserEmail}`);
+    // Route to get courses (might not be finished)
+    app.get('/courses', (req, res) => {
+        // Thanks to the middleware, we know the user is authenticated
+        // We can access the user's email via req.userEmail
+        const strEmail = req.email;
+        const sql = 'SELECT * FROM tblCourses WHERE instructor_email = ?';
     
-    //     // TODO: Add database logic to fetch courses for loggedInUserEmail
-    //     // Example: db.all('SELECT * FROM tblCourses WHERE instructor_email = ?', [loggedInUserEmail], ...)
+        // fetch courses for loggedInUserEmail
+        db.all(sql, [strEmail], (err, result) => {
+            if (err) {
+                console.error('Database error fetching courses:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (!result || result.length === 0) {
+                return res.status(400).json({ error: 'No courses found for this user' })
+            }
+            // If courses are found, send them back to the client
+            res.status(201).json({
+                courses: result
+            })
+        })
+    });
     
-    //     res.json({
-    //     message: `Placeholder: Courses for ${loggedInUserEmail} would be here.`,
-    //     });
-    // });
+    // Route to add a course (might not be finished)
+    app.post('/courses', (req, res) => {
+        const strEmail = req.userEmail;
+        const { strCourseName, strCourseDescription } = req.body; // Get data from request body
+        // need to fix the db to include everything here
+        const sql = `INSERT INTO tblCourses 
+                (course_name, course_description, course_number, section_number, term_code, course_description, instructor_email) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                `;
+        db.run(sql, [strCourseName, strCourseDescription, null, null, null, null, strEmail], function (err) {
+            if (err) {
+                console.error('Database error inserting course:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If the course is added successfully, send a success response
+            res.status(201).json({ status: 'success', message: `Course '${strCourseName}' added.` });
+        });
+        // TODO: Add validation and database logic to insert the course,
+        // potentially linking it to the loggedInUserEmail (e.g., in tblEnrollments or an instructor_email column)
+    });
     
-    // // Example: Route to add a course (needs to be implemented)
-    // app.post('/courses', (req, res) => {
-    //     const loggedInUserEmail = req.userEmail;
-    //     const { courseName, courseDescription } = req.body; // Get data from request body
-    //     console.log(`User ${loggedInUserEmail} attempting to add course: ${courseName}`);
+    // Route to get students (might not be finished)
+    app.get('/students', (req, res) => {
+        const strCourseID = req.query.courseID; // Get course ID from query parameters
+        const sql = 'SELECT * FROM tblEnrollments WHERE course_id = ?';
     
-    //     // TODO: Add validation and database logic to insert the course,
-    //     // potentially linking it to the loggedInUserEmail (e.g., in tblEnrollments or an instructor_email column)
+        // fetch students for loggedInUserEmail
+        db.all(sql, [strCourseID], (err, result) => {
+            if (err) {
+                console.error('Database error fetching students:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (!result) {
+                return res.status(400).json({ error: 'No students found for this course' })
+            }
+            // If students are found, send them back to the client
+            res.status(201).json({
+                students: result
+            })
+        })
+    });
+
+    // Route to add a student (might not be finished)
+    app.post('/students', (req, res) => {
+        const strCourseID = req.body.courseID; // Get course ID from request body
+        const strEmail = req.body.email; // Get student email from request body
+        const sql = `INSERT INTO tblEnrollments 
+                (course_id, student_email, role) 
+                VALUES (?, ?, ?)
+                `;
+        db.run(sql, [strCourseID, strEmail, 'Student'], function (err) {
+            if (err) {
+                console.error('Database error inserting student:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If the student is added successfully, send a success response
+            res.status(201).json({ status: 'success', message: `Student '${strEmail}' added to course '${strCourseID}'.` });
+        })
+    });
+
+    // Route to get course groups (might not be finished)
+    app.get('/groups', (req, res) => {
+        const strCourseID = req.query.courseID; // Get course ID from query parameters
+        const sql = 'SELECT * FROM tblGroups WHERE course_id = ?';
     
-    //     res.status(201).json({ status: "success", message: `Course '${courseName}' added (placeholder).` });
-    // });
+        // fetch groups for loggedInUserEmail
+        db.all(sql, [strCourseID], (err, result) => {
+            if (err) {
+                console.error('Database error fetching groups:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (!result) {
+                return res.status(400).json({ error: 'No groups found for this course' })
+            }
+            // If groups are found, send them back to the client
+            res.status(201).json({
+                groups: result
+            })
+        })
+    });
+
+    // Route to add a course group (might not be finished)
+    app.post('/groups', (req, res) => {
+        const strCourseID = req.body.courseID; // Get course ID from request body
+        const strGroupName = req.body.groupName; // Get group name from request body
+        const sql = `INSERT INTO tblGroups 
+                (course_id, group_name) 
+                VALUES (?, ?)
+                `;
+        db.run(sql, [strCourseID, strGroupName], function (err) {
+            if (err) {
+                console.error('Database error inserting group:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If the group is added successfully, send a success response
+            res.status(201).json({ status: 'success', message: `Group '${strGroupName}' added to course '${strCourseID}'.` });
+        })
+    });
+
+    // Route to get group members (might not be finished)
+    app.get('/groupmembers', (req, res) => {
+        const strGroupID = req.query.groupID; // Get group ID from query parameters
+        const sql = 'SELECT * FROM tblGroupMembers WHERE group_id = ?';
     
+        // fetch group members for loggedInUserEmail
+        db.all(sql, [strGroupID], (err, result) => {
+            if (err) {
+                console.error('Database error fetching group members:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (!result) {
+                return res.status(400).json({ error: 'No group members found for this group' })
+            }
+            // If group members are found, send them back to the client
+            res.status(201).json({
+                groupMembers: result
+            })
+        })
+    });
+
+    // Route to add group members (might not be finished)
+    app.post('/groupmembers', (req, res) => {
+        const strGroupID = req.body.groupID; // Get group ID from request body
+        const strEmail = req.body.email; // Get student email from request body
+        const sql = `INSERT INTO tblGroupMembers 
+                (group_id, user_id) 
+                VALUES (?, ?)
+                `;
+        db.run(sql, [strGroupID, strEmail], function (err) {
+            if (err) {
+                console.error('Database error inserting group member:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            // If the group member is added successfully, send a success response
+            res.status(201).json({ status: 'success', message: `Student '${studentEmail}' added to group '${groupID}'.` });
+        })
+    });
+
+    // Route to get assessments (might not be finished)
+    app.get('/assessments', (req, res) => {
+        const strGroupID = req.query.groupID; // Get group ID from query parameters
+        const sql = 'SELECT * FROM tblFeedback WHERE group_id = ?';
+    
+        // fetch feedback for loggedInUserEmail
+        db.all(sql, [strGroupID], (err, result) => {
+            if (err) {
+                console.error('Database error fetching feedback:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (!result) {
+                return res.status(400).json({ error: 'No feedback found for this group' })
+            }
+            // If feedback is found, send it back to the client
+            res.status(201).json({
+                feedback: result
+            })
+        })
+    });
+
+    // Need to add the rest, im just doing this at 3am so im gts
     
     // Add other protected routes here (e.g., GET /students, POST /teams, etc.)
-    
+
     
     // --- Error Handling and Server Start (Keep these at the end) ---
     app.use((req, res, next) => {
