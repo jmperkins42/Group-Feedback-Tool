@@ -183,10 +183,12 @@ app.post('/sessions', (req, res, next) => {
             if (bcrypt.compareSync(strPassword, strHash)) {
                 // ON success that the passwords match, create a new sessionid using uuid, and inthen insert into tbl sessions
                 let strSessionID = uuidv4();
-                let strCommand = `INSERT INTO tblSessions VALUES (?, ?, ?, ?, ?)`;
+                let strCommand = `INSERT INTO tblSessions VALUES (?, ?, ?, ?, ?, ?)`;
                 let datNow = new Date();
                 let strNow = datNow.toISOString()
-                db.run(strCommand, [strSessionID, strEmail, strNow, null, 'Active'], function (err,result) {
+                let datLater = new Date(datNow.getTime() + 12 * 60 * 60 * 1000); // Add 12 hours
+                let strLater = datLater.toISOString();
+                db.run(strCommand, [strSessionID, strEmail, strNow, strLater, null, 'Active'], function (err,result) {
                     if (err) {
                         console.log(err);
                         res.status(400).json({
@@ -220,7 +222,7 @@ function verifySession(sessionID) {
     return new Promise((resolve, reject) => {
         // Select the user_id (email) associated with the session
         // Also good practice to check session status/expiry later
-        const sql = 'SELECT user_id FROM tblSessions WHERE SessionID = ?';
+        const sql = 'SELECT user_id FROM tblSessions WHERE id = ?';
         // Use db.get as SessionID should be unique, more efficient
         db.get(sql, [sessionID], (err, row) => {
             if (err) {
@@ -287,11 +289,8 @@ function verifySession(sessionID) {
 
     // Route to get courses (might not be finished)
     app.get('/courses', (req, res) => {
-        // Thanks to the middleware, we know the user is authenticated
-        // We can access the user's email via req.email
         const strEmail = req.userEmail;
-        // we have to use tblEnrollments to get the courses
-        const sql = 'SELECT * FROM tblCourses INNER JOIN tblEnrollments WHERE tblCourses.course_id == tblEnrollments.course_id AND tblEnrollments.user_email = ?';
+        const sql = 'SELECT * FROM tblCourses INNER JOIN tblEnrollments WHERE tblCourses.id == tblEnrollments.course_id AND tblEnrollments.user_email = ?';
     
         // fetch courses for user
         db.all(sql, [strEmail], (err, result) => {
@@ -312,7 +311,7 @@ function verifySession(sessionID) {
     // Route to add a course
     app.post('/courses', (req, res) => {
         const strEmail = req.userEmail;
-        const strCourseName = req.body.coursename;
+        const strCourseName = req.body.courseName;
         const strCourseID = uuidv4();
         const strEnrollmentID = uuidv4();
 

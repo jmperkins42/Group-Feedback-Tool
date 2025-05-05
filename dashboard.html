@@ -575,7 +575,7 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script>
 
-        const strBaseURL = 'http://localhost:8000/';
+        const strBaseURL = 'http://127.0.0.1:8000/';
 
         // Initialize DataTables for Students and Teams tables
         $(document).ready(function() {
@@ -741,18 +741,26 @@
 
         // Add New Course Form Submission
         document.getElementById('btnAddNewCourse').addEventListener('click', () => {
-            const courseName = document.getElementById('courseNameInput').value;
-            const courseDescription = document.getElementById('courseDescriptionInput').value;
+            const strCourseName = document.getElementById('courseNameInput').value;
+            const strCourseDescription = document.getElementById('courseDescriptionInput').value;
 
             // Validate form inputs
-            if (courseName && courseDescription) {
+            if (strCourseName && strCourseDescription) {
                 // SEND DATA TO SERVER
-
+                fetch(strBaseURL + 'courses', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        courseName: strCourseName,
+                        courseDescription: strCourseDescription
+                    })
+                })
                 // Then show success message
                 Swal.fire({
                     icon: 'success',
                     title: 'Course Added',
-                    text: `Course "${courseName}" has been added successfully!`,
+                    text: `Course "${strCourseName}" has been added successfully!`,
                 });
 
                 // Reset form and close modal
@@ -871,7 +879,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Perform logout action here
-                    fetch(baseAPIurl + '/logout', {
+                    fetch(strBaseURL + '/logout', {
                         method: 'POST',
                         credentials: 'include',
                         headers: {
