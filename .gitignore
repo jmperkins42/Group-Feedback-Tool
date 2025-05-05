@@ -1,3 +1,5 @@
 # Node modules
 node_modules/
 .env
+# ingnore the db file
+backend/feedbacktool.db

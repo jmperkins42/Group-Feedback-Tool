@@ -82,7 +82,7 @@
                     <p>Grade Average: <span id="gradeAverage">85%</span></P>
                     <P>Number of Students: <span id="numberOfStudents">30</span></P>
                     <h3>Assign Reviews:</h3>
-                    <button class="btn btn-lg btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#createIndividualReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
+                    <button class="btn btn-lg btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#createReviewModal"><i class="bi bi-envelope"></i> Send Review</button>
 
                 </div>
                 <!-- Students Tab -->
@@ -382,57 +382,12 @@
         </div>
     </div>
 
-    <!-- Create Individual Review Modal -->
-    <div class="modal fade" id="createIndividualReviewModal" tabindex="-1" aria-labelledby="createIndividualReviewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createIndividualReviewModalLabel">Create New Review for Student</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="createIndividualReviewForm">
-                        <!-- Review Title -->
-                        <div class="mb-3">
-                            <label for="txtIndividualReviewTitle" class="form-label">Review Title</label>
-                            <input type="text" class="form-control" id="txtIndividualReviewTitle" placeholder="Enter review title" required>
-                        </div>
-
-                        <!-- Add Questions Section -->
-                        <h5>Questions</h5>
-                        <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddIndividualQuestion">
-                            <i class="bi bi-plus-circle"></i> Add Question
-                        </button>
-
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="tblIndividualQuestions">
-                                <thead>
-                                    <tr>
-                                        <th>Question Type</th>
-                                        <th>Question</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Dynamically Added Rows -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <button type="button" class="btn btn-success" id="btnCreateIndividualReview">Create Review</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Create Team Review Modal -->
+    <!-- Create Review Modal -->
     <div class="modal fade" id="createReviewModal" tabindex="-1" aria-labelledby="createReviewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createReviewModalLabel">Create New Review for Team</h5>
+                    <h5 class="modal-title" id="createReviewModalLabel">Create New Review for Student</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -914,5 +869,12 @@
             });
         });
     </script>
+
+    <!-- 4. SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- 5. Your app.js script LAST -->
+    <script src="dashboard.js"></script>
+
 </body>
 </html>
