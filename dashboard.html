@@ -48,40 +48,7 @@
     <div class="container-fluid mb-4" id="divCourseCards">
         <div class="bg-light p-4 shadow-lg">
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                
-                <!-- Card 1 -->
-                <div class="col">
-                    <div class="card h-100 shadow-lg">
-                        <div class="card-body">
-                            <h5 class="card-title">CSC 3100</h5>
-                            <p class="card-text">Description of CSC 3100. This course covers topics A, B, and C.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="col">
-                    <div class="card h-100 shadow-lg">
-                        <div class="card-body">
-                            <h5 class="card-title">Course 2</h5>
-                            <p class="card-text">Description of Course 2. This course focuses on topics X, Y, and Z.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="col">
-                    <div class="card h-100 shadow-lg">
-                        <div class="card-body">
-                            <h5 class="card-title">Course 3</h5>
-                            <p class="card-text">Description of Course 3. Learn about topics M, N, and O.</p>
-                            <button class="btn btn-primary btn-view-course-details">View Details</button>
-                        </div>     
-                    </div>
-                </div>
 
-                <!-- Dynamically filled cards -->
-                
             </div>
         </div>
     </div>
@@ -608,6 +575,8 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script>
 
+        const strBaseURL = 'http://localhost:8000/';
+
         // Initialize DataTables for Students and Teams tables
         $(document).ready(function() {
             $('#tblStudents').DataTable({
@@ -633,6 +602,37 @@
             });
         });
         
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(strBaseURL + 'courses', {
+                method: 'GET',
+                credentials: 'include'
+            }).then(res => {
+                if (!res.ok) {
+                    throw new Error('Failed to fetch courses.');
+                }
+
+                return res.json();
+            }).then(data => {
+                const container = document.querySelector('#divCourseCards .row');
+                data.courses.forEach((course, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'col';
+                    card.innerHTML = `
+                        <div class="card h-100 shadow-lg">
+                            <div class="card-body">
+                                <h5 class="card-title">${course.coursename}</h5>
+                                <p class="card-text">No description yet.</p>
+                                <button class="btn btn-primary btn-view-course-details" data-id="${course.id}">View Details</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(err => {
+                console.error('Error loading courses:', err);
+            });
+        });
 
         // Show password fields when "Change Password" button is clicked
         document.getElementById('btnChangePassword').addEventListener('click', () => {
