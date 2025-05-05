@@ -8,7 +8,7 @@ Feel free to delete stuff if it doesn't make sense to have
 
 // Start Global Variables
 const regEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-const strBaseURL = 'http://localhost:8000/' // testing URL 
+const strBaseURL = 'http://127.0.0.1:8000/' // testing URL 
 // End Global Variables
 
 
@@ -78,6 +78,7 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
         try{
             const objResponse = await fetch(strBaseURL + 'sessions',{
                 method:'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type':'application/json'
                 },
@@ -100,8 +101,6 @@ document.querySelector('#btnLogin').addEventListener('click', function(e){
                     timer: 1500
                 }) 
                 console.log('objData', objData)
-                // Save the SessionID to sessionStorage
-                sessionStorage.setItem('SessionID',objData.SessionID)
                 //clear our form
                 document.querySelector('#txtUsernameLogin').value = ""
                 document.querySelector('#txtPasswordLogin').value = ""
