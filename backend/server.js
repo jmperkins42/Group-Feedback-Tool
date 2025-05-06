@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt')
 const cookieParser = require('cookie-parser')
 const intSalt = 10
 
-const dbSource = "feedbacktool.db"
+const dbSource = "backend/feedbacktool.db"
 const HTTP_PORT = 8000
 const db = new sqlite3.Database(dbSource)
 

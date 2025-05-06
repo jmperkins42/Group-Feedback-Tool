@@ -6,6 +6,33 @@
     const strBaseURL = "http://127.0.0.1:8000/"; // testing URL
     // End Global Variables
 
+
+    function loadStudents(courseID) {
+        fetch(strBaseURL + `students?courseID=${courseID}`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = ''; // Clear existing rows
+            data.students.forEach((student, index) => {
+                const strFullName = `${student.firstname} ${student.lastname}`;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${strFullName || 'N/A'}</td>
+                    <td>${student.user_email}</td>
+                    <td>${student.grade || '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+            console.error('Error loading students:', err);
+        });
+    }
+
     // Event listener for the "Create Review" button in the INDIVIDUAL modal
     document
     .querySelector("#btnCreateReview")
@@ -186,6 +213,60 @@
     });
     });
 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch(strBaseURL + 'courses', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(res => {
+            if (!res.ok) {
+                throw new Error('Failed to fetch courses.');
+            }
+
+            return res.json();
+        }).then(data => {
+            const container = document.querySelector('#divCourseCards .row');
+            data.courses.forEach((course, index) => {
+                const card = document.createElement('div');
+                card.className = 'col';
+                card.innerHTML = `
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-body">
+                            <h5 class="card-title">${course.coursename}</h5>
+                            <p class="card-text">No description yet.</p>
+                            <button class="btn btn-primary btn-view-course-details" data-id="${course.id}">View Details</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Handle "View Details" button click
+                document.querySelectorAll('.btn-view-course-details').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const courseID = button.getAttribute('data-id');
+                        strCurrentCourseID = courseID;
+
+                        const courseCard = button.closest('.card');
+                        const courseName = courseCard.querySelector('.card-title').textContent;
+                        const courseDescription = courseCard.querySelector('.card-text').textContent;
+
+                        // Populate course details
+                        document.getElementById('courseName').textContent = courseName;
+                        document.getElementById('courseDescription').textContent = courseDescription;
+                        loadStudents(courseID);
+
+                        // Hide dashboard and show course details view
+                        document.getElementById('divCourseCards').classList.add('d-none');
+                        document.getElementById('courseDetailsView').classList.remove('d-none');
+                    });
+                });
+            });
+        })
+        .catch(err => {
+            console.error('Error loading courses:', err);
+        });
+    });
+
     // Show password fields when "Change Password" button is clicked
     document.getElementById("btnChangePassword").addEventListener("click", () => {
     const passwordFields = document.getElementById("passwordFields");
@@ -294,37 +375,41 @@
     });
 
     // Add New Course Form Submission
-    document.getElementById("btnAddNewCourse").addEventListener("click", () => {
-    const courseName = document.getElementById("courseNameInput").value;
-    const courseDescription = document.getElementById(
-        "courseDescriptionInput"
-    ).value;
+    // Add New Course Form Submission
+    document.getElementById('btnAddNewCourse').addEventListener('click', () => {
+        const strCourseName = document.getElementById('courseNameInput').value;
+        const strCourseDescription = document.getElementById('courseDescriptionInput').value;
 
-    // Validate form inputs
-    if (courseName && courseDescription) {
-        // SEND DATA TO SERVER
+        // Validate form inputs
+        if (strCourseName && strCourseDescription) {
+            fetch(strBaseURL + 'courses', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseName: strCourseName,
+                    courseDescription: strCourseDescription
+                })
+            })
+            // Then show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Course Added',
+                text: `Course "${strCourseName}" has been added successfully!`,
+            });
 
-        // Then show success message
-        Swal.fire({
-        icon: "success",
-        title: "Course Added",
-        text: `Course "${courseName}" has been added successfully!`,
-        });
-
-        // Reset form and close modal
-        document.getElementById("addCourseForm").reset();
-        const addCourseModal = bootstrap.Modal.getInstance(
-        document.getElementById("addCourseModal")
-        );
-        addCourseModal.hide();
-    } else {
-        // Show error message
-        Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Please fill in all fields.",
-        });
-    }
+            // Reset form and close modal
+            document.getElementById('addCourseForm').reset();
+            const addCourseModal = bootstrap.Modal.getInstance(document.getElementById('addCourseModal'));
+            addCourseModal.hide();
+        } else {
+            // Show error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please fill in all fields.',
+            });
+        }
     });
 
     // Add Team Member Button Click (in Create Team Modal)
@@ -480,3 +565,4 @@
     questionsTbody.innerHTML = ""; // Clear all added questions
     // You might want to reset other fields if necessary
     }
+
