@@ -33,158 +33,133 @@
         });
     }
 
-    // Event listener for the "Create Review" button in the INDIVIDUAL modal
-    document
-    .querySelector("#btnCreateReview")
-    .addEventListener("click", async function () {
+    // Event listener for the "Create Review" button in the modal
+    document.querySelector("#btnCreateReview").addEventListener("click", async function () {
         const reviewTitle = document.querySelector("#txtReviewTitle").value.trim();
         const questionRows = document.querySelectorAll("#tblQuestions tbody tr");
         const questions = [];
         let validationError = false;
         let errorMessage = "";
 
-        // if (!currentCourseId) {
-        //     Swal.fire('Error', 'Cannot create review. Course context is missing. Please go back and select a course.', 'error');
-        //     return;
-        // }
-        if (!reviewTitle) {
-        Swal.fire("Warning", "Please enter a Review Title.", "warning");
-        return;
-        }
-
-        questionRows.forEach((row, index) => {
-        const typeSelect = row.querySelector(".question-type");
-        const textInput = row.querySelector(".question-text"); // Now looks for .question-text
-        const optionsInput = row.querySelector(".question-options"); // Now looks for .question-options
-
-        const questionType = typeSelect ? typeSelect.value : "Unknown";
-        // Ensure textInput exists before trying to access its value
-        const questionText = textInput ? textInput.value.trim() : "";
-        let questionOptions = null;
-
-        // Check if the text input itself was found and has text
-        if (!textInput || !questionText) {
-            validationError = true;
-            errorMessage += `<p>Question ${
-            index + 1
-            } text cannot be empty.</p>`;
-            // Use 'continue' equivalent for forEach by returning early
+        // Make sure we have a course ID
+        if (!strCurrentCourseID) {
+            Swal.fire('Error', 'Cannot create review. Please select a course first.', 'error');
             return;
         }
 
-        if (questionType === "Multiple Choice" || questionType === "Likert") {
-            // Check if optionsInput exists and has text
-            if (!optionsInput || !optionsInput.value.trim()) {
-            validationError = true;
-            errorMessage += `<p>Question ${
-                index + 1
-            } ('${questionType}') requires options. Please enter one option per line.</p>`;
-            } else {
-            const optionsArray = optionsInput.value
-                .split("\n")
-                .map((opt) => opt.trim())
-                .filter((opt) => opt !== "");
-            if (optionsArray.length < 2) {
+        if (!reviewTitle) {
+            Swal.fire("Warning", "Please enter a Review Title.", "warning");
+            return;
+        }
+
+        questionRows.forEach((row, index) => {
+            const typeSelect = row.querySelector(".question-type");
+            const textInput = row.querySelector(".question-text");
+            const optionsInput = row.querySelector(".question-options");
+
+            const questionType = typeSelect ? typeSelect.value : "Unknown";
+            const questionText = textInput ? textInput.value.trim() : "";
+            let questionOptions = null;
+
+            if (!textInput || !questionText) {
                 validationError = true;
-                errorMessage += `<p>Question ${
-                index + 1
-                } ('${questionType}') requires at least two valid options.</p>`;
-            } else {
-                // Only stringify if valid
-                questionOptions = JSON.stringify(optionsArray);
+                errorMessage += `<p>Question ${index + 1} text cannot be empty.</p>`;
+                return;
             }
-            }
-        }
 
-        // Only push if no validation error occurred *for this specific question*
-        // and the question text is valid (redundant check, but safe)
-        if (questionText) {
-            questions.push({
-            type: questionType,
-            text: questionText,
-            options: questionOptions, // Will be null if not MC/Likert or if options were invalid
-            });
-        }
+            if (questionType === "Multiple Choice" || questionType === "Likert") {
+                if (!optionsInput || !optionsInput.value.trim()) {
+                    validationError = true;
+                    errorMessage += `<p>Question ${index + 1} ('${questionType}') requires options. Please enter one option per line.</p>`;
+                } else {
+                    const optionsArray = optionsInput.value
+                        .split("\n")
+                        .map((opt) => opt.trim())
+                        .filter((opt) => opt !== "");
+                    if (optionsArray.length < 2) {
+                        validationError = true;
+                        errorMessage += `<p>Question ${index + 1} ('${questionType}') requires at least two valid options.</p>`;
+                    } else {
+                        questionOptions = JSON.stringify(optionsArray);
+                    }
+                }
+            }
+
+            if (questionText) {
+                questions.push({
+                    type: questionType,
+                    text: questionText,
+                    options: questionOptions,
+                });
+            }
         });
 
-        // Check overall validation flag after the loop
         if (validationError) {
-        Swal.fire({
-            icon: "error",
-            title: "Validation Errors",
-            html: errorMessage,
-        });
-        return;
+            Swal.fire({
+                icon: "error",
+                title: "Validation Errors",
+                html: errorMessage,
+            });
+            return;
         }
 
         if (questions.length === 0 && !validationError) {
-        Swal.fire(
-            "Warning",
-            "Please add at least one valid question.",
-            "warning"
-        );
-        return;
+            Swal.fire("Warning", "Please add at least one valid question.", "warning");
+            return;
         }
 
         const reviewData = {
-        //course_id: currentCourseId, // Make sure currentCourseId is defined elsewhere if needed
-        title: reviewTitle,
-        questions: questions,
-        status: "Active",
-        type: "Individual", // Or determine dynamically if needed
+            course_id: strCurrentCourseID, // This was the key missing piece
+            title: reviewTitle,
+            questions: questions,
+            status: "Active",
+            type: "Individual",
         };
 
         console.log("Sending review data:", reviewData);
 
         try {
-        const response = await fetch(strBaseURL + "/assessments", {
-            // Ensure this endpoint is correct
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(reviewData),
-        });
-
-        // Check if response is ok AND content type is JSON before parsing
-        if (!response.ok) {
-            // Try to get error message from response body if possible
-            let errorMsg = `HTTP Error: ${response.status}`;
-            try {
-            const errorResult = await response.json();
-            errorMsg = errorResult.message || errorMsg;
-            } catch (e) {
-            // If response is not JSON, use the status text
-            errorMsg = response.statusText || errorMsg;
-            }
-            throw new Error(errorMsg);
-        }
-
-        const result = await response.json(); // Now safe to parse
-
-        if (result.status === "success") {
-            Swal.fire({
-            icon: "success",
-            title: "Review Created!",
-            text: `Review "${reviewTitle}" (ID: ${
-                result.assessmentId || "N/A"
-            }) is ready.`, // Handle potential missing ID
+            const response = await fetch(strBaseURL + "assessments", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reviewData),
             });
-            clearCreateReviewModal(); // Make sure this function exists and clears the modal
-            const reviewModalEl = document.getElementById("createReviewModal");
-            if (reviewModalEl)
-            bootstrap.Modal.getInstance(reviewModalEl)?.hide();
-            // TODO: Refresh list of available reviews or update UI
-        } else {
-            // Handle cases where response is ok but application reported failure
-            throw new Error(result.message || "Review creation failed.");
-        }
+
+            if (!response.ok) {
+                let errorMsg = `HTTP Error: ${response.status}`;
+                try {
+                    const errorResult = await response.json();
+                    errorMsg = errorResult.message || errorResult.error || errorMsg;
+                } catch (e) {
+                    errorMsg = response.statusText || errorMsg;
+                }
+                throw new Error(errorMsg);
+            }
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Review Created!",
+                    text: `Review "${reviewTitle}" has been created successfully.`,
+                });
+                clearCreateReviewModal();
+                const reviewModalEl = document.getElementById("createReviewModal");
+                if (reviewModalEl) {
+                    bootstrap.Modal.getInstance(reviewModalEl)?.hide();
+                }
+            } else {
+                throw new Error(result.message || "Review creation failed.");
+            }
         } catch (error) {
-        console.error("Error creating review:", error);
-        Swal.fire({
-            icon: "error",
-            title: "Creation Failed",
-            text: error.message || "Could not create the review. Please try again.",
-        });
+            console.error("Error creating review:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Creation Failed",
+                text: error.message || "Could not create the review. Please try again.",
+            });
         }
     });
 
