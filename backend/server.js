@@ -302,7 +302,7 @@ function verifySession(sessionID) {
                 return res.status(400).json({ error: 'No courses found for this user' })
             }
             // If courses are found, send them back to the client
-            res.status(201).json({
+            res.status(200).json({
                 courses: result
             })
         })
@@ -337,7 +337,7 @@ function verifySession(sessionID) {
         });
     });
     
-    // Route to get students (might not be finished)
+    // Route to get students
     app.get('/students', (req, res, next) => {
         const strCourseID = req.query.courseID; // Get course ID from query parameters
         const sql = 'SELECT tblEnrollments.user_email, tblUsers.firstname, tblUsers.lastname FROM tblEnrollments JOIN tblUsers ON tblEnrollments.user_email = tblUsers.email WHERE tblEnrollments.course_id = ?';
@@ -352,11 +352,11 @@ function verifySession(sessionID) {
                 return res.status(400).json({ error: 'No students found for this course' })
             }
             // If students are found, send them back to the client
-            res.status(201).json({ students: result })
+            res.status(200).json({ students: result })
         })
     });
 
-// Route to add a student (might not be finished)
+// Route to add a student
 app.post('/students', (req, res) => {
     const strCourseID = req.body.courseID;
     const strEmail = req.body.email;
@@ -386,10 +386,10 @@ app.post('/students', (req, res) => {
     })
 });
 
-    // Route to get course groups (might not be finished)
-    app.get('/groups', (req, res) => {
+    // Route to get course groups
+    app.get('/groups', (req, res, next) => {
         const strCourseID = req.query.courseID; // Get course ID from query parameters
-        const sql = 'SELECT * FROM tblGroups WHERE course_id = ?';
+        const sql = 'SELECT * FROM tblCourseGroups WHERE course_id = ?';
     
         // fetch groups for loggedInUserEmail
         db.all(sql, [strCourseID], (err, result) => {
@@ -401,32 +401,32 @@ app.post('/students', (req, res) => {
                 return res.status(400).json({ error: 'No groups found for this course' })
             }
             // If groups are found, send them back to the client
-            res.status(201).json({
+            res.status(200).json({
                 groups: result
             })
         })
     });
 
-    // Route to add a course group (might not be finished)
-    app.post('/groups', (req, res) => {
-        const strCourseID = req.body.courseID; // Get course ID from request body
-        const strGroupName = req.body.groupName; // Get group name from request body
-        const sql = `INSERT INTO tblGroups 
-                (course_id, group_name) 
-                VALUES (?, ?)
-                `;
-        db.run(sql, [strCourseID, strGroupName], function (err) {
-            if (err) {
-                console.error('Database error inserting group:', err.message);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-            // If the group is added successfully, send a success response
-            res.status(201).json({ status: 'success', message: `Group '${strGroupName}' added to course '${strCourseID}'.` });
-        })
-    });
+// Route to add a course group
+app.post('/groups', (req, res, next) => {
+    const strCourseID = req.body.courseID;
+    const strGroupName = req.body.groupName;
+    const strGroupID = uuidv4();
 
-    // Route to get group members (might not be finished)
-    app.get('/groupmembers', (req, res) => {
+    const strInsertGroup = `INSERT INTO tblCourseGroups VALUES (?, ?, ?)`;
+    db.run(strInsertGroup, [strGroupID, strGroupName, strCourseID], function (err) {
+        if (err) {
+            console.error('Database error inserting group:', err.message);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        // If the group is added successfully, send a success response
+        res.status(201).json({ status: 'success', groupID: strGroupID, message: `Group '${strGroupName}' added to course '${strCourseID}'.` });
+    })
+});
+
+    // Route to get group members
+    app.get('/groupmembers', (req, res, next) => {
         const strGroupID = req.query.groupID; // Get group ID from query parameters
         const sql = 'SELECT * FROM tblGroupMembers WHERE group_id = ?';
     
@@ -440,27 +440,26 @@ app.post('/students', (req, res) => {
                 return res.status(400).json({ error: 'No group members found for this group' })
             }
             // If group members are found, send them back to the client
-            res.status(201).json({
+            res.status(200).json({
                 groupMembers: result
             })
         })
     });
 
-    // Route to add group members (might not be finished)
-    app.post('/groupmembers', (req, res) => {
-        const strGroupID = req.body.groupID; // Get group ID from request body
-        const strEmail = req.body.email; // Get student email from request body
-        const sql = `INSERT INTO tblGroupMembers 
-                (group_id, user_id) 
-                VALUES (?, ?)
-                `;
-        db.run(sql, [strGroupID, strEmail], function (err) {
+    // Route to add group members
+    app.post('/groupmembers', (req, res, next) => {
+        const strGroupID = req.body.groupID;
+        const strEmail = req.body.email;
+
+        const strInsertMembers = `INSERT INTO tblGroupMembers VALUES (?, ?)`;
+        db.run(strInsertMembers, [strGroupID, strEmail], function (err) {
             if (err) {
                 console.error('Database error inserting group member:', err.message);
                 return res.status(500).json({ error: 'Internal server error' });
             }
+
             // If the group member is added successfully, send a success response
-            res.status(201).json({ status: 'success', message: `Student '${studentEmail}' added to group '${groupID}'.` });
+            res.status(201).json({ status: 'success', message: `Student '${strEmail}' added to group '${strGroupID}'.` });
         })
     });
 

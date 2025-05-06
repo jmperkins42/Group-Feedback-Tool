@@ -125,25 +125,7 @@
                                 </tr>
                             </thead>
                             <tbody id="teamsTableBody">
-                                <!-- Dynamically filled rows -->
-                                <tr>
-                                    <td>1</td>
-                                    <td>Team Alpha</td>
-                                    <td>John Doe, Jane Smith</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="teamActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="teamActionsDropdown">
-                                            <li><button class="dropdown-item btn-edit-team" data-bs-toggle="modal" data-bs-target="#editTeamModal"><i class="bi bi-pencil"></i> Edit</button></li>
-                                            <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-eye"></i> View Reviews</button>
-                                    </td>
-                                </tr>
-    
+                                
                             </tbody>
                         </table>
     
@@ -501,6 +483,54 @@
             });
         }
 
+        function loadGroups(courseID) {
+            fetch(strBaseURL + `groups?courseID=${courseID}`, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('teamsTableBody');
+                tbody.innerHTML = '';
+
+                const groupPromises = data.groups.map(group => {
+                    return fetch(strBaseURL + `groupmembers?groupID=${group.group_id}`, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                    .then(res => res.json())
+                    .then(memberData => {
+                        const memberEmails = memberData.groupMembers.map(m => m.user_id).join(', ');
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td></td>
+                            <td>${group.group_name}</td>
+                            <td>${memberEmails}</td>
+                            <td>
+                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><button class="dropdown-item btn-edit-team"><i class="bi bi-pencil"></i> Edit</button></li>
+                                    <li><button class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Remove</button></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary"><i class="bi bi-eye"></i> View Reviews</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                });
+
+                return Promise.all(groupPromises);
+            })
+            .catch(err => {
+                console.error('Error loading teams:', err);
+            });
+        }
+
         // Initialize DataTables for Students and Teams tables
         $(document).ready(function() {
             $('#tblStudents').DataTable({
@@ -566,6 +596,7 @@
                             document.getElementById('courseName').textContent = courseName;
                             document.getElementById('courseDescription').textContent = courseDescription;
                             loadStudents(courseID);
+                            loadGroups(courseID);
 
                             // Hide dashboard and show course details view
                             document.getElementById('divCourseCards').classList.add('d-none');
@@ -600,7 +631,6 @@
                 document.getElementById('editStudentGrade').value = studentGrade;
             });
         });
-
 
         // Edit Team Modal autofill and functionality
         document.querySelectorAll('.btn-edit-team').forEach(button => {
@@ -743,6 +773,69 @@
             });
         })
 
+        document.querySelector("#btnCreateTeam").addEventListener("click", function () {
+            const strGroupName = document.querySelector("#txtTeamName").value;
+
+            const members = [];
+            const rows = document.querySelectorAll("#tblTeamMembers tbody tr");
+
+            rows.forEach(row => {
+                //const nameInput = row.querySelector("input[placeholder='Enter member name']").value;
+                const email = row.querySelector("input[placeholder='Enter member email']").value;
+
+                if (email) {
+                    members.push(email);
+                }
+            });
+
+            fetch(strBaseURL + 'groups', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    groupName: strGroupName,
+                    courseID: strCurrentCourseID
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status !== 'success') throw new Error(data.error || 'Failed to create group');
+
+                const strGroupID = data.groupID;
+
+                const addMembers = members.map(email => 
+                    fetch(strBaseURL + 'groupmembers', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            groupID: strGroupID,
+                            email: email
+                        })
+                    })
+                );
+
+                return Promise.all(addMembers);
+            })
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Team Created',
+                    text: `Team "${strTeamName}" created successfully.`
+                });
+                bootstrap.Modal.getInstance(document.getElementById('createTeamModal')).hide();
+                loadGroups(strCurrentCourseID);
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message || 'Something went wrong.'
+                });
+            });
+        });
+
         // Add Team Member Button Click
         document.getElementById('btnAddTeamMember').addEventListener('click', () => {
             const tableBody = document.querySelector('#tblTeamMembers tbody');
@@ -874,7 +967,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- 5. Your app.js script LAST -->
-    <script src="dashboard.js"></script>
+    <!--<script src="dashboard.js"></script>-->
 
 </body>
 </html>
