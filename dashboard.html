@@ -154,34 +154,6 @@
                         </thead>
                         <tbody id="ReviewsTableBody">
                             <!-- Dynamically filled rows -->
-                            <tr>
-                                <td>1</td>
-                                <td>John Doe</td>
-                                <td>Jane Smith</td>
-                                <td>Team Alpha</td>
-                                <td>7</td>
-                                <td>Great work! You have a great attitude.</td>
-                                <td>Jane was very enthusiastic and hard working but she was often late to meetings.</td>
-                                <td>Pending</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Accept</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2">Reject</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Jane Smith</td>
-                                <td>John Doe</td>
-                                <td>Team Alpha</td>
-                                <td>9</td>
-                                <td>Awesome Job! You are killing it</td>
-                                <td>John was the best team mate ever!</td>
-                                <td>Accepted</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Accept</button>
-                                    <button class="btn btn-sm btn-outline-dark ms-2">Reject</button>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
 
@@ -859,22 +831,26 @@
             });
         });
 
-        // INDIVIDUAL REVIEW BLOCK START
-        // Add Question Button Click
-        document.getElementById('btnAddIndividualQuestion').addEventListener('click', () => {
-            const tableBody = document.querySelector('#tblIndividualQuestions tbody');
-            const newRow = document.createElement('tr');
+    // Add Question Button Click (in Create Review Modal)
+    document.getElementById("btnAddQuestion").addEventListener("click", () => {
+        const tableBody = document.querySelector("#tblQuestions tbody");
+        const newRow = document.createElement("tr");
 
-            newRow.innerHTML = `
+        // Use innerHTML for easier structure, but ensure classes are correct
+        newRow.innerHTML = `
                 <td>
-                    <select class="form-select">
-                        <option value="short-answer">Short Answer</option>
-                        <option value="multiple-choice">Multiple Choice</option>
-                        <option value="likert">Likert</option>
+                    <select class="form-select question-type"> <!-- Added 'question-type' class -->
+                        <option value="Text">Text</option> <!-- Changed values to match validation -->
+                        <option value="Multiple Choice">Multiple Choice</option>
+                        <option value="Likert">Likert</option>
+                        <option value="Numeric">Numeric Scale (1-10)</option>
                     </select>
                 </td>
                 <td>
-                    <input type="text" class="form-control" placeholder="Enter question" required>
+                    <!-- Using textarea for potentially longer questions -->
+                    <textarea class="form-control question-text" placeholder="Enter question text" rows="2" required></textarea> <!-- Added 'question-text' class -->
+                    <!-- Textarea for options, hidden by default -->
+                    <textarea class="form-control question-options" placeholder="Enter options, one per line" rows="3" style="display: none; margin-top: 5px;"></textarea> <!-- Added 'question-options' class -->
                 </td>
                 <td>
                     <button type="button" class="btn btn-sm btn-danger btnRemoveQuestion">
@@ -883,91 +859,251 @@
                 </td>
             `;
 
-            tableBody.appendChild(newRow);
+        tableBody.appendChild(newRow);
 
-            // Add event listener to the remove button
-            newRow.querySelector('.btnRemoveQuestion').addEventListener('click', () => {
-                newRow.remove();
+        // Add event listener to the *newly created* select element for this row
+        const newSelect = newRow.querySelector(".question-type");
+        if (newSelect) {
+            newSelect.addEventListener("change", handleQuestionTypeChange);
+        }
+
+        // Add event listener to the *newly created* remove button for this row
+        const removeButton = newRow.querySelector(".btnRemoveQuestion");
+        if (removeButton) {
+            removeButton.addEventListener("click", () => {
+            newRow.remove();
             });
+        }
         });
 
-        // INDIVIDUAL REVIEW BLOCK END
+
+    // Helper function to show/hide options based on question type
+    function handleQuestionTypeChange(event) {
+        const selectElement = event.target;
+        // Find the closest ancestor row (tr)
+        const row = selectElement.closest("tr");
+        if (!row) return; // Should not happen, but safety check
+        // Find the options textarea *within that specific row*
+        const optionsTextarea = row.querySelector(".question-options");
+        if (!optionsTextarea) return; // Safety check
+    
+        // Show options only for Multiple Choice and Likert
+        if (
+            selectElement.value === "Multiple Choice" ||
+            selectElement.value === "Likert"
+        ) {
+            optionsTextarea.style.display = "block";
+        } else {
+            optionsTextarea.style.display = "none";
+        }
+        }
 
 
-        // Add Question Button Click
-        document.getElementById('btnAddQuestion').addEventListener('click', () => {
-            const tableBody = document.querySelector('#tblQuestions tbody');
-            const newRow = document.createElement('tr');
-
-            newRow.innerHTML = `
-                <td>
-                    <select class="form-select">
-                        <option value="short-answer">Short Answer</option>
-                        <option value="multiple-choice">Multiple Choice</option>
-                        <option value="likert">Likert</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control" placeholder="Enter question" required>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger btnRemoveQuestion">
-                        <i class="bi bi-trash"></i> Remove
-                    </button>
-                </td>
-            `;
-
-            tableBody.appendChild(newRow);
-
-            // Add event listener to the remove button
-            newRow.querySelector('.btnRemoveQuestion').addEventListener('click', () => {
-                newRow.remove();
-            });
-        });
-
-        // logout button functionality
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will be logged out.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, log me out!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Perform logout action here
-                    fetch(strBaseURL + '/logout', {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // Logout successful, redirect to login page
-                            window.location.href = 'index.html'; // Redirect to login page
+        document.querySelector("#btnCreateReview").addEventListener("click", async function () {
+            const reviewTitle = document.querySelector("#txtReviewTitle").value.trim();
+            const questionRows = document.querySelectorAll("#tblQuestions tbody tr");
+            const questions = [];
+            let validationError = false;
+            let errorMessage = "";
+    
+            // Make sure we have a course ID
+            if (!strCurrentCourseID) {
+                Swal.fire('Error', 'Cannot create review. Please select a course first.', 'error');
+                return;
+            }
+    
+            if (!reviewTitle) {
+                Swal.fire("Warning", "Please enter a Review Title.", "warning");
+                return;
+            }
+    
+            questionRows.forEach((row, index) => {
+                const typeSelect = row.querySelector(".question-type");
+                const textInput = row.querySelector(".question-text");
+                const optionsInput = row.querySelector(".question-options");
+    
+                const questionType = typeSelect ? typeSelect.value : "Unknown";
+                const questionText = textInput ? textInput.value.trim() : "";
+                let questionOptions = null;
+    
+                if (!textInput || !questionText) {
+                    validationError = true;
+                    errorMessage += `<p>Question ${index + 1} text cannot be empty.</p>`;
+                    return;
+                }
+    
+                if (questionType === "Multiple Choice" || questionType === "Likert") {
+                    if (!optionsInput || !optionsInput.value.trim()) {
+                        validationError = true;
+                        errorMessage += `<p>Question ${index + 1} ('${questionType}') requires options. Please enter one option per line.</p>`;
+                    } else {
+                        const optionsArray = optionsInput.value
+                            .split("\n")
+                            .map((opt) => opt.trim())
+                            .filter((opt) => opt !== "");
+                        if (optionsArray.length < 2) {
+                            validationError = true;
+                            errorMessage += `<p>Question ${index + 1} ('${questionType}') requires at least two valid options.</p>`;
                         } else {
-                            // Handle logout error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Logout Failed',
-                                text: 'Please try again.',
-                            });
+                            questionOptions = JSON.stringify(optionsArray);
                         }
-                    })
+                    }
+                }
+    
+                if (questionText) {
+                    questions.push({
+                        type: questionType,
+                        text: questionText,
+                        options: questionOptions,
+                    });
                 }
             });
+    
+            if (validationError) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Validation Errors",
+                    html: errorMessage,
+                });
+                return;
+            }
+    
+            if (questions.length === 0 && !validationError) {
+                Swal.fire("Warning", "Please add at least one valid question.", "warning");
+                return;
+            }
+    
+            const reviewData = {
+                course_id: strCurrentCourseID, // This was the key missing piece
+                title: reviewTitle,
+                questions: questions,
+                status: "Active",
+                type: "Individual",
+            };
+    
+            console.log("Sending review data:", reviewData);
+    
+            try {
+                const response = await fetch(strBaseURL + "assessments", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(reviewData),
+                });
+    
+                if (!response.ok) {
+                    let errorMsg = `HTTP Error: ${response.status}`;
+                    try {
+                        const errorResult = await response.json();
+                        errorMsg = errorResult.message || errorResult.error || errorMsg;
+                    } catch (e) {
+                        errorMsg = response.statusText || errorMsg;
+                    }
+                    throw new Error(errorMsg);
+                }
+    
+                const result = await response.json();
+    
+                if (result.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Review Created!",
+                        text: `Review "${reviewTitle}" has been created successfully.`,
+                    });
+                    clearCreateReviewModal();
+                    const reviewModalEl = document.getElementById("createReviewModal");
+                    if (reviewModalEl) {
+                        bootstrap.Modal.getInstance(reviewModalEl)?.hide();
+                    }
+                } else {
+                    throw new Error(result.message || "Review creation failed.");
+                }
+            } catch (error) {
+                console.error("Error creating review:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Creation Failed",
+                    text: error.message || "Could not create the review. Please try again.",
+                });
+            }
         });
+
+            // logout button functionality
+            document.getElementById('btnLogout').addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log me out!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform logout action here
+                        fetch(strBaseURL + 'logout', { // Ensure strBaseURL ends with '/' or adjust here
+                            method: 'POST',
+                            credentials: 'include', // Important for sending cookies
+                            headers: {
+                                // Content-Type is not strictly needed for this POST if no body is sent,
+                                // but it's good practice to include it.
+                                'Content-Type': 'application/json',
+                                // Add other headers if required by your CORS setup or backend
+                            }
+                            // No body is needed for this specific logout request
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                // Logout successful (status 200-299)
+                                // Optional: Show a brief success message before redirecting
+                                Swal.fire({
+                                    title: 'Logged Out!',
+                                    text: 'You have been successfully logged out.',
+                                    icon: 'success',
+                                    timer: 1500, // Auto close after 1.5 seconds
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = 'index.html'; // Redirect to login page
+                                });
+                            } else {
+                                // Handle logout error (status 4xx, 5xx)
+                                // Try to get error message from backend response
+                                response.json().then(data => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Logout Failed',
+                                        text: data.message || 'Could not log out. Please try again.',
+                                    });
+                                }).catch(() => {
+                                    // If response wasn't JSON or other parsing error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Logout Failed',
+                                        text: 'An unexpected error occurred. Please try again.',
+                                    });
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Handle network errors (fetch couldn't reach the server)
+                            console.error('Logout fetch error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Network Error',
+                                text: 'Could not connect to the server to log out. Please check your connection.',
+                            });
+                        });
+                    }
+                });
+            });
+            
     </script>
 
     <!-- 4. SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 5. Your app.js script LAST -->
-    <!--<script src="dashboard.js"></script>-->
+    <!-- 5. Your app.js script LAST <script src="dashboard.js"></script> -->
 
 
 </body>

@@ -620,57 +620,53 @@ app.post('/groups', (req, res, next) => {
     });
 
 
+
+// logout route
+// Note: 'async' isn't strictly needed here as there's no 'await', but it's harmless.
+    // Consider adding 'requireAuth' if you want to ensure only authenticated users
+    app.post('/logout', (req, res) => {
+        const sessionID = req.cookies.sessionID;
+
+        if (!sessionID) {
+            // No cookie found, nothing to log out.
+            // Send a success-like response or a specific status if preferred.
+            return res.status(200).json({ message: 'No active session found.' });
+        }
+
+        // --- Corrected SQL ---
+        // Update the status to 'Inactive' and set the last_used_time to now.
+        const sql = 'UPDATE tblSessions SET status = ?, last_used_time = ? WHERE id = ?';
+        const statusInactive = 'Inactive';
+        const lastUsedTime = new Date().toISOString(); // Use current time as end time
+
+        db.run(sql, [statusInactive, lastUsedTime, sessionID], function (err) {
+            if (err) {
+                console.error('Database error ending session:', err.message);
+                // Send a generic server error message
+                return res.status(500).json({ message: 'Failed to end session due to server error.' });
+            }
+
+            // --- Session updated successfully in DB ---
+
+            // Clear the cookie on the client side
+            res.clearCookie('sessionID', {
+                httpOnly: true,
+                secure: false, // Set to true if using HTTPS (recommended for production)
+                sameSite: 'Strict' // Good security practice
+            });
+
+            // Send success response
+            return res.status(200).json({status:"success",message: 'Logged out successfully.' });
+        });
+    });
+
+
+
     // --- Error Handling and Server Start (Keep these at the end) ---
     app.use((req, res, next) => {
         // 404 Handler for routes not matched above
         res.status(404).json({ message: 'Resource not found' });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// logout route
-app.post('/logout', async (req, res) => {
-    const sessionID = req.cookies.sessionID;
-
-    if (!sessionID) {
-        return res.status(400).json({ error: 'No session to log out from.' });
-    }
-
-    const sql = 'UPDATE tblSessions SET status = "Inactive", end_date = ? WHERE SessionID = ?';
-    const endDate = new Date().toISOString();
-
-    db.run(sql, [endDate, sessionID], function (err) {
-        if (err) {
-            console.error('Database error ending session:', err.message);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
-        res.clearCookie('sessionID');
-        res.status(200).json({ message: 'Logged out successfully.' });
-    });
-});
-
-
-
 
     app.listen(HTTP_PORT, () => {
         console.log(`Server running on port ${HTTP_PORT}`);
