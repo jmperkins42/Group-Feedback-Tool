@@ -375,37 +375,41 @@
     });
 
     // Add New Course Form Submission
-    document.getElementById("btnAddNewCourse").addEventListener("click", () => {
-    const courseName = document.getElementById("courseNameInput").value;
-    const courseDescription = document.getElementById(
-        "courseDescriptionInput"
-    ).value;
+    // Add New Course Form Submission
+    document.getElementById('btnAddNewCourse').addEventListener('click', () => {
+        const strCourseName = document.getElementById('courseNameInput').value;
+        const strCourseDescription = document.getElementById('courseDescriptionInput').value;
 
-    // Validate form inputs
-    if (courseName && courseDescription) {
-        // SEND DATA TO SERVER
+        // Validate form inputs
+        if (strCourseName && strCourseDescription) {
+            fetch(strBaseURL + 'courses', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseName: strCourseName,
+                    courseDescription: strCourseDescription
+                })
+            })
+            // Then show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Course Added',
+                text: `Course "${strCourseName}" has been added successfully!`,
+            });
 
-        // Then show success message
-        Swal.fire({
-        icon: "success",
-        title: "Course Added",
-        text: `Course "${courseName}" has been added successfully!`,
-        });
-
-        // Reset form and close modal
-        document.getElementById("addCourseForm").reset();
-        const addCourseModal = bootstrap.Modal.getInstance(
-        document.getElementById("addCourseModal")
-        );
-        addCourseModal.hide();
-    } else {
-        // Show error message
-        Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Please fill in all fields.",
-        });
-    }
+            // Reset form and close modal
+            document.getElementById('addCourseForm').reset();
+            const addCourseModal = bootstrap.Modal.getInstance(document.getElementById('addCourseModal'));
+            addCourseModal.hide();
+        } else {
+            // Show error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please fill in all fields.',
+            });
+        }
     });
 
     // Add Team Member Button Click (in Create Team Modal)
